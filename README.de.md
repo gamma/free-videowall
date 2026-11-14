@@ -82,3 +82,5 @@ Copyright 2026 Gerry Weißbach. [Apache-Lizenz 2.0](LICENSE).
 Die Lizenz gilt für Code und Dokumentation dieses Projekts, nicht für deine Medien. Unabhängiges Projekt; keine Verbindung zu Roku, Inc.
 
 Projektwebsite und GitHub-Pages-Einrichtung: [Website-Anleitung](docs/website.md).
+
+[Playlist visuell zusammenstellen](https://gamma.github.io/free-roku-videowall/de/editor.html): Dateinamen oder M3U einfügen, Videos und Bilder sortieren, Platzhalter-Vorschau ansehen und `playlist.m3u` herunterladen. Läuft lokal im Browser.

@@ -29,3 +29,35 @@
 - Standbilder werden überblendet, keine zwei bewegten Videos. Das nächste Video läuft währenddessen darunter weiter. Keine Tonüberblendung.
 - Das Hilfsprogramm extrahiert momentan das tatsächliche Dateiende, auch wenn EXTINF die Wiedergabe früher begrenzt. Für ein passendes Endbild vollständige Videos abspielen.
 - Nach jeder Runde wird die Playlist neu geladen. Bei einer unbrauchbaren Liste wartet die App fünf Sekunden; Wiedergabefehler überspringen den Eintrag.
+
+## Video → picture → video / Video → Bild → Video
+
+The app already supports an ordinary picture between videos. Example / Die App unterstützt ein normales Zwischenbild zwischen Videos. Beispiel:
+
+```m3u
+#EXTM3U
+#EXTINF:-1,Welcome
+videos/welcome.mp4
+#EXTINF:8,Interlude
+#EXT-X-FADE:1.5
+pictures/interlude.jpg
+#EXTINF:-1,Our story
+videos/story.mp4
+```
+
+The picture is shown for eight seconds (including its incoming blend). The playlist loops from the last entry to the first. A picture interlude is not an automatically captured video frame. On its own, it does not guarantee black-free transitions: without an outgoing video end frame, the video-to-picture boundary can still leave a gap. For the existing prepared-frame blend, generate `.start.jpg` and `.end.jpg` files using `scripts/prepare_usb.py`. Images need no extra frame files. Audio is not crossfaded.
+
+Das Bild wird acht Sekunden gezeigt (einschließlich der eingehenden Blende). Nach dem letzten Eintrag folgt wieder der erste. Das Zwischenbild ist kein automatisch aufgenommenes Videoframe. Es garantiert allein keine Übergänge ohne Schwarz: Ohne Endbild des ausgehenden Videos kann beim Wechsel zum Bild eine Lücke bleiben. Für die bestehende Blendentechnik mit `scripts/prepare_usb.py` die Dateien `.start.jpg` und `.end.jpg` erzeugen. Bilder benötigen keine zusätzlichen Hilfsbilder. Keine Tonüberblendung.
+
+### Visual workshop / Visuelle Werkstatt
+
+[English editor](https://gamma.github.io/free-roku-videowall/editor.html) · [Deutscher Editor](https://gamma.github.io/free-roku-videowall/de/editor.html)
+
+- Paste an M3U or one filename per line. On Windows, use **Copy as path**; on macOS, **Option+Cmd+C** copies pathnames. Normal file-copy clipboard contents vary by browser and OS.
+- For full computer paths, specify the stick root (e.g. `E:` or `/Volumes/USB`). Check that the result matches the actual USB folders.
+- Choose the USB root folder to preserve subfolder paths. Selecting individual files or dropping them supplies names only, so those files must be in the USB root. Folder import sorts media filenames; it does not import an existing playlist or add helper frame images.
+- Move entries up/down, edit paths, picture durations/video limits and outgoing blend times. Download `playlist.m3u` into the USB root. It replaces your existing playlist only when you save/copy it there yourself.
+- The preview uses generated placeholders; unlimited videos are assigned an illustrative eight seconds. It does not validate codecs, file existence or seamless transitions on your device. It does not generate video frame images.
+- Media contents are neither read nor uploaded. M3U files are read as local text. No persistent storage: download before closing.
+
+Dateinamen/M3U einfügen, mit Pfeilen sortieren, Bilddauer und Blenden anpassen und `playlist.m3u` herunterladen. Windows: **Als Pfad kopieren**; macOS: **Option+Cmd+C**. Normales Kopieren von Dateien funktioniert nicht in jedem Browser gleich. Bei Rechnerpfaden das USB-Hauptverzeichnis angeben; für Unterordner das Hauptverzeichnis des Sticks auswählen. Einzeldatei-Auswahl/Drag-and-drop liefert nur Namen. Die Vorschau zeigt Platzhalter und angenommene Videolaufzeiten, prüft keine echten Dateien oder TV-Kompatibilität und erzeugt keine Videoframes. Medien werden nicht gelesen oder hochgeladen. Vor dem Schließen herunterladen; es wird nichts dauerhaft gespeichert.

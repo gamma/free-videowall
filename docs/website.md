@@ -12,6 +12,7 @@ Roku dashboard URLs after deployment:
 
 | Purpose | English | Deutsch |
 | --- | --- | --- |
+| Playlist workshop | `/editor.html` | `/de/editor.html` |
 | Website | `/` | `/de/` |
 | Support | `/support.html` | `/de/support.html` |
 | Privacy | `/privacy.html` | `/de/privacy.html` |
@@ -21,3 +22,5 @@ Roku dashboard URLs after deployment:
 Prefix each path with the base URL without its final slash. Privacy and terms are project-specific drafts, not a legal opinion. Provider: Gerry Weißbach; address supplied by the owner, contact email from the existing Gamma Production imprint. Review these details before publication. The older external imprint still displays a different address.
 
 Preview headlessly with `python3 -m http.server 8765 --directory website` and visit `http://localhost:8765/`. To edit content, edit the HTML directly. Store upload descriptions and artwork are in [store-assets](store-assets/README.md).
+
+The browser-only workshop imports filenames/M3U, edits order and timing, exports UTF-8 M3U, and previews placeholders. Run `npm run test:website` for import/export contract tests. Media file contents are never read; only an explicitly selected M3U is read as text.
