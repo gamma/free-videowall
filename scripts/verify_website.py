@@ -26,7 +26,7 @@ class LinkChecker(HTMLParser):
 
 
 for language in ('', 'de'):
-    for name in ('index', 'privacy', 'terms', 'imprint', 'support'):
+    for name in ('index', 'privacy', 'terms', 'imprint', 'support', 'editor'):
         path = SITE / language / f'{name}.html'
         LinkChecker(path).feed(path.read_text(encoding='utf-8'))
 
@@ -37,4 +37,4 @@ for language in ('en', 'de'):
         if not 0 < length <= limit:
             raise ValueError(f'{path.name}: {length} characters; limit {limit}')
 
-print('Website: 10 EN/DE pages, local links and Store description limits verified.')
+print('Website: 12 EN/DE pages, local links and Store description limits verified.')
