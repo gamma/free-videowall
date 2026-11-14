@@ -1,3 +1,4 @@
+import {collectPaths} from './folder-drop.mjs';
 import {parse, serialize, move, suggestedRoot} from './playlist-core.mjs';
 const de = document.documentElement.lang === 'de';
 const t = (en, german) => de ? german : en;
@@ -80,13 +81,37 @@ $('folder-files').onchange = e => {fileImport(e.target.files, true);e.target.val
 $('paste-zone').addEventListener('paste', event => {
   if (event.clipboardData?.files.length && !event.clipboardData.getData('text/plain')) {event.preventDefault();fileImport(event.clipboardData.files);}
 });
-$('paste-zone').addEventListener('dragover', e => {e.preventDefault();});
-$('paste-zone').addEventListener('drop', e => {
-  e.preventDefault();
-  const entries = Array.from(e.dataTransfer.items || []).map(item => item.webkitGetAsEntry?.());
-  if (entries.some(entry => entry?.isDirectory)) {status(t('For folders, use “Choose USB folder” to preserve subfolders.', 'Für Ordner bitte „USB-Ordner wählen“ verwenden, damit Unterordner erhalten bleiben.'));return;}
-  if (e.dataTransfer.files.length) fileImport(e.dataTransfer.files);
-  else { $('import-text').value = e.dataTransfer.getData('text/plain'); }
+let pendingDrop = false;
+const zone = $('paste-zone');
+zone.addEventListener('dragover', e => {e.preventDefault();zone.classList.add('drag-active');});
+zone.addEventListener('dragleave', e => {if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-active');});
+// Prevent a file dropped outside the target from navigating away from the editor.
+window.addEventListener('dragover', e => {if (Array.from(e.dataTransfer.types).includes('Files')) e.preventDefault();});
+window.addEventListener('drop', e => {if (Array.from(e.dataTransfer.types).includes('Files')) e.preventDefault();});
+zone.addEventListener('drop', async e => {
+  e.preventDefault();zone.classList.remove('drag-active');
+  if (pendingDrop) return;
+  // Capture handles/files synchronously: the drag data store closes after this event.
+  const entries = Array.from(e.dataTransfer.items || []).filter(item => item.kind === 'file').map(item => (item.getAsEntry || item.webkitGetAsEntry)?.call(item));
+  const files = Array.from(e.dataTransfer.files);
+  const text = e.dataTransfer.getData('text/plain');
+  if (!entries.some(entry => entry?.isDirectory)) {
+    if (files.length) await fileImport(files);
+    else $('import-text').value = text;
+    return;
+  }
+  if (entries.some(entry => !entry)) {status(t('Your browser cannot read all dropped folders. Use Choose USB folder instead.', 'Der Browser kann nicht alle abgelegten Ordner lesen. Bitte USB-Ordner wählen verwenden.'));return;}
+  pendingDrop = true;zone.setAttribute('aria-busy', 'true');
+  status(t('Reading folder names…', 'Ordnernamen werden gelesen…'));
+  try {
+    const stripRoot = $('drop-root').checked;
+    const names = await collectPaths(entries, {stripRoot});
+    $('usb-root').value = '';
+    $('import-text').value = names.join('\n');
+    importText($('import-text').value, true);
+  } catch {
+    status(t('Folder could not be fully read (access denied or more than 10,000 entries). Nothing imported. Try a smaller folder or Choose USB folder.', 'Ordner konnte nicht vollständig gelesen werden (Zugriff verweigert oder mehr als 10.000 Einträge). Nichts importiert. Kleineren Ordner oder USB-Ordner wählen verwenden.'));
+  } finally {pendingDrop = false;zone.removeAttribute('aria-busy');}
 });
 $('download').onclick = () => {
   const url = URL.createObjectURL(new Blob([serialize(items)], {type:'audio/x-mpegurl;charset=utf-8'}));
