@@ -1,0 +1,7 @@
+#EXTM3U
+#EXTINF:-1,Play the whole video
+#EXT-X-FADE:1.5
+videos/welcome.mp4
+#EXTINF:10,Show this picture for ten seconds
+#EXT-X-FADE:1.5
+pictures/offer.jpg

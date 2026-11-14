@@ -1,0 +1,8 @@
+title=Free Videowall
+major_version=1
+minor_version=0
+build_version=5
+ui_resolutions=hd
+splash_color=#000000
+splash_min_time=0
+usb_media_handler=1

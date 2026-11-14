@@ -1,0 +1,6 @@
+{
+  "rootDir": ".",
+  "files": ["source/**/*.brs", "components/**/*"],
+  "createPackage": false,
+  "copyToStaging": false
+}

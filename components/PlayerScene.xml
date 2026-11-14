@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="PlayerScene" extends="Scene">
+    <interface>
+        <field id="exitRequested" type="boolean" value="false" />
+    </interface>
+    <script type="text/brightscript" uri="PlayerScene.brs" />
+    <children>
+        <Video id="video" width="1280" height="720" enableUI="false" disableScreenSaver="true" enableScreenSaverWhilePlaying="false" />
+        <Poster id="slide" width="1280" height="720" loadWidth="1280" loadHeight="720" loadDisplayMode="scaleToFit" visible="false" />
+        <Timer id="slideTimer" repeat="false" />
+        <Poster id="endFrame" width="1280" height="720" loadWidth="1280" loadHeight="720" loadDisplayMode="scaleToFit" opacity="0" />
+        <Poster id="incomingFrame" width="1280" height="720" loadWidth="1280" loadHeight="720" loadDisplayMode="scaleToFit" opacity="0" />
+        <Poster id="cover" width="1280" height="720" loadWidth="1280" loadHeight="720" loadDisplayMode="scaleToFit" opacity="0" />
+        <Animation id="dissolve" duration="1.5" easeFunction="linear">
+            <FloatFieldInterpolator id="fadeTrack" key="[0,1]" keyValue="[1,0]" fieldToInterp="cover.opacity" />
+        </Animation>
+        <PlaylistTask id="loader" />
+        <Timer id="retry" duration="5" repeat="false" />
+    </children>
+</component>
