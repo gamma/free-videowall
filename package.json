@@ -6,7 +6,9 @@
   "scripts": {
     "check": "bsc --project bsconfig.json",
     "test": "brs --root tests source/playlist.brs tests/playlist.brs",
-    "build": "python3 scripts/build.py"
+    "build": "python3 scripts/build.py",
+    "test:tizen": "node --test platforms/tizen/tests/*.test.js",
+    "build:tizen": "python3 scripts/build_tizen.py"
   },
   "devDependencies": {
     "brighterscript": "0.73.8",
