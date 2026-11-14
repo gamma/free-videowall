@@ -3,12 +3,14 @@
     "use strict";
     var player, items = [], index = 0, timer, generation = 0, hidden = false;
     var slide = document.getElementById("slide"), status = document.getElementById("status");
+    var transitions = window.VideowallTransitions(document.getElementById("outgoing"), document.getElementById("incoming"));
     function message(text) {
         status.textContent = text;
         status.style.display = text ? "block" : "none";
         if (text) console.log("Free Videowall: " + text);
     }
-    function stop() {
+    function stop(preserveTransition) {
+        if (!preserveTransition) transitions.clear();
         generation++;
         clearTimeout(timer);
         slide.onload = slide.onerror = null;
@@ -24,12 +26,13 @@
         if (!hidden) timer = setTimeout(scan, 5000);
     }
     function next() {
+        transitions.hold();
         index++;
-        if (index >= items.length) scan();
+        if (index >= items.length) scan(true);
         else play();
     }
     function play() {
-        stop();
+        stop(true);
         if (hidden) return;
         var item = items[index], token = generation;
         function failed(error) {
@@ -38,6 +41,7 @@
             message("Datei übersprungen: " + item.path + " (" + (error && (error.message || error.name) || "Wiedergabefehler") + ")");
             timer = setTimeout(next, 1000);
         }
+        transitions.prepare(item);
         if (item.kind === "image") {
             // A missing or undecodable image must not stall the playlist.
             timer = setTimeout(function () { failed(); }, 15000);
@@ -46,7 +50,9 @@
                 clearTimeout(timer);
                 message("");
                 slide.style.display = "block";
-                timer = setTimeout(next, item.duration * 1000);
+                transitions.reveal(item, function () {
+                    if (token === generation) timer = setTimeout(next, item.duration * 1000);
+                });
             };
             slide.onerror = failed;
             slide.src = item.uri;
@@ -67,12 +73,12 @@
             player.prepareAsync(function () {
                 if (token !== generation) return;
                 clearTimeout(timer);
-                try { player.play(); message(""); } catch (error) { failed(error); }
+                try { player.play(); message(""); transitions.reveal(item, function () {}); } catch (error) { failed(error); }
             }, failed);
         } catch (error) { failed(error); }
     }
-    function scan() {
-        stop();
+    function scan(preserveTransition) {
+        stop(preserveTransition === true);
         if (hidden) return;
         var token = generation;
         message("Suche USB-Playlist …");
@@ -106,7 +112,14 @@
                                 window.parsePlaylist(text).forEach(function (item) {
                                     try {
                                         var file = root.resolve(item.path);
-                                        if (!file.isDirectory) { item.uri = file.toURI(); loaded.push(item); }
+                                        if (!file.isDirectory) {
+                                            item.uri = file.toURI();
+                                            if (item.kind === "video") {
+                                                try { item.endImage = root.resolve(item.path + ".end.jpg").toURI(); } catch (ignored) {}
+                                                try { item.firstImage = root.resolve(item.path + ".start.jpg").toURI(); } catch (ignored) {}
+                                            }
+                                            loaded.push(item);
+                                        }
                                     } catch (err) { console.log("Missing USB file: " + item.path); }
                                 });
                                 if (!loaded.length) { playlistAt(p + 1); return; }

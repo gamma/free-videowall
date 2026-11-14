@@ -18,8 +18,18 @@ nimmt das Verzeichnis `platforms/` nicht auf.
   wird geschlossen, beim Zurückkehren beginnt die Playlist von vorn.
 - Versucht den Bildschirmschoner während der App-Laufzeit auszuschalten.
 
-Noch offen: weiche Übergänge (`#EXT-X-FADE` wird gelesen, aber nicht angewendet),
-Start-/Endbilder, Spulen, USB-/Einschalt-Autostart, Kioskmodus und Store-Freigabe.
+Weiche Übergänge: Bilder werden überblendet; Videos nutzen dieselben
+`.start.jpg`- und `.end.jpg`-Dateien wie Roku. Die ausgehende Dauer kommt aus
+`#EXT-X-FADE` (Standard 1,5 Sekunden, 0 schaltet die Blende ab).
+Das Endbild bleibt während USB-Suche und Laden des nächsten Mediums sichtbar.
+Das nächste Video läuft bereits unter der Standbildblende. Es gibt keine
+Überblendung zweier bewegter Videos oder der Tonspuren. Bei Bildern beginnt die
+Anzeigedauer nach der eingehenden Blende; bei Videos zählt die Wiedergabezeit
+bereits während der Blende. Ein fehlendes Endbild führt zum direkten Wechsel;
+bei fehlendem Startbild wird zum laufenden Video geblendet. Schwarzphasen sind
+in diesen Rückfällen möglich. Vorladen der Hilfsbilder hat zwei Sekunden Timeout.
+
+Noch offen: Spulen, USB-/Einschalt-Autostart, Kioskmodus und Store-Freigabe.
 Es gibt keine Netzwerk-Medienquelle und keine Schreibzugriffe auf den Stick.
 Im Prototyp werden absolute Pfade sowie `..` abgelehnt; übliche relative Pfade
 wie `videos/test.mp4` funktionieren. Das ist enger als der Roku-Parser.
@@ -71,7 +81,14 @@ Auf diesem Entwicklungsrechner sind `tizen` und `sdb` derzeit nicht im PATH.
 
 4. Einen vom TV lesbaren USB-Stick mit `playlist.m3u`, einem kurzen H.264/AAC-
    MP4 und einem JPG vorbereiten. Beide Dateien über relative Pfade referenzieren.
-   Für diesen Prototyp braucht es keine mit FFmpeg erzeugten Übergangsbilder.
+   Für Videoblenden auf dem Rechner mit installiertem FFmpeg vorbereiten:
+
+   ```sh
+   python3 scripts/prepare_usb.py /Volumes/DEIN_STICK/playlist.m3u
+   ```
+
+   Das Skript legt die Hilfsbilder neben die Videos auf den Stick. Bilder
+   benötigen keine Vorbereitung.
 
 ## Abnahme am Gerät
 
@@ -79,6 +96,11 @@ TV-Modell, Baujahr, Firmware und Testergebnis festhalten:
 
 - USB wird gefunden; JPG und MP4 erscheinen im richtigen Seitenverhältnis.
 - Mindestens drei Schleifen, Zeitbegrenzung eines Videos und Bilddauer prüfen.
+- Bild/Bild, Bild/Video, Video/Bild und Video/Video einschließlich letzter/erster
+  Eintrag prüfen. Der alte Frame muss beim Laden des nächsten Mediums sichtbar
+  bleiben; besonders AVPlay-Layer-Reihenfolge und Schwarzphasen beobachten.
+- `#EXT-X-FADE:0` und eine andere Blenddauer testen; Hilfsbilder entfernen und
+  den Rückfall prüfen. Sichtbare Parität mit Roku ist noch am Gerät abzunehmen.
 - Datei mit Leerzeichen/Umlaut sowie einen Unterordner testen.
 - Fehlendes Medium, nicht abspielbares Video und ungültige Playlist testen.
 - USB abziehen/wieder einstecken; App soll erneut eine Playlist finden.
