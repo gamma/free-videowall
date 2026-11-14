@@ -4,7 +4,7 @@
 
 This is a development preview, not a Roku Store app yet. You need a Roku with a working USB port and USB media support, and a computer on the same local network.
 
-1. Download `free-videowall.zip` from [Releases](https://github.com/gamma/free-videowall/releases), or [build it](development.md). Keep the ZIP intact.
+1. Download `free-videowall.zip` from [Releases](https://github.com/gamma/free-roku-videowall/releases), or [build it](development.md). Keep the ZIP intact.
 2. On the Roku remote press **Home three times, Up twice, Right, Left, Right, Left, Right**.
 3. Enable the Development Application Installer, read the terms and set a password. The device restarts.
 4. Open the Roku's IP address in your computer's browser. Sign in as `rokudev` with the password you just set.
@@ -21,7 +21,7 @@ Official instructions: [Roku developer setup](https://developer.roku.com/dev/doc
 
 Dies ist eine Entwicklungsversion, noch keine Roku-Store-App. Du brauchst einen Roku mit funktionierendem USB-Anschluss und USB-Medienunterstützung sowie einen Rechner im selben lokalen Netzwerk.
 
-1. `free-videowall.zip` unter [Releases](https://github.com/gamma/free-videowall/releases) herunterladen oder [selbst bauen](development.md). Nicht entpacken.
+1. `free-videowall.zip` unter [Releases](https://github.com/gamma/free-roku-videowall/releases) herunterladen oder [selbst bauen](development.md). Nicht entpacken.
 2. Auf der Roku-Fernbedienung **Home dreimal, Hoch zweimal, Rechts, Links, Rechts, Links, Rechts** drücken.
 3. Development Application Installer aktivieren, Bedingungen lesen und Passwort setzen. Das Gerät startet neu.
 4. Die IP-Adresse des Roku im Browser am Rechner öffnen. Benutzer `rokudev`, dazu das gerade gesetzte Passwort.

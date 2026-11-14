@@ -9,3 +9,4 @@ out/
 *.key
 images/endframes/*
 !images/endframes/.gitkeep
+tmp/

@@ -1,0 +1,9 @@
+Use case: logo-brand
+Asset type: finished 16:9 title screen for the free, open-source Roku USB video and photo player Free Videowall.
+Primary request: cool but very simple, quiet and instantly recognizable. A refined minimal title card, not a screenshot, mockup, or physical screen.
+Scene/backdrop: clean dark background, subtle tonal depth, ample empty space.
+Subject: a single distinctive geometric symbol combining a widescreen display outline with a continuous playback loop. Use a restrained luminous accent, crisp edges, flat graphic clarity, no elaborate 3D ornament.
+Composition: centered balanced lockup, emblem above title, generous spacing; keep all important content inside the central 70 percent for television safe areas. Readable from across a room.
+Text (verbatim): "Free Videowall"
+Typography: exact spelling, modern clear sans-serif, bright high-contrast lettering. Only these two words. Make the emblem and text feel like one coherent polished open-source utility identity.
+Constraints: one final title card. No tagline, no additional words, no Roku corporate logo, no watermark, no media thumbnails, no people, no buttons, no menus, no decorative clutter, no outer device frame.

@@ -1,10 +1,12 @@
 # Free Videowall
 
+![Free Videowall](images/branding/splash-hd.jpg)
+
 **Dein USB-Stick. Deine Playlist. Einfach abspielen.**
 
 Ein kostenloser, quelloffener USB-Player für Videos und Bilder auf Roku-Geräten mit USB-Medienunterstützung. Keine Menüs. Keine Werbung. Kein Benutzerkonto in der App. Dateien und eine M3U auf den Stick kopieren, App öffnen – die Wiedergabe läuft in Endlosschleife.
 
-**Entwicklungsversion:** noch nicht im Roku Streaming Store. Die Installation benötigt derzeit den Roku-Entwicklermodus. [Vorschau herunterladen](https://github.com/gamma/free-videowall/releases) · [English](README.md)
+**Entwicklungsversion:** noch nicht im Roku Streaming Store. Die Installation benötigt derzeit den Roku-Entwicklermodus. [Vorschau herunterladen](https://github.com/gamma/free-roku-videowall/releases) · [English](README.md)
 
 ## Loslegen
 
@@ -67,9 +69,11 @@ Die Blende geht vom Standbild am Ende des alten Videos zum Standbild am Anfang d
 - Die Vorschau sperrt den Bildschirmschoner während der Laufzeit. TV-Abschalttimer sind davon unabhängig.
 - Kein gesperrter Kiosk: Roku Home und TV-Funktionen bleiben erreichbar.
 
-Eine normale Store-Installation ist noch in Vorbereitung: [Veröffentlichungsstand](docs/publishing.md#deutsch). Fehler und Vorschläge: [GitHub Issues](https://github.com/gamma/free-videowall/issues). Für Entwickler: [Build-Anleitung](docs/development.md).
+Eine normale Store-Installation ist noch in Vorbereitung: [Veröffentlichungsstand](docs/publishing.md#deutsch). Fehler und Vorschläge: [GitHub Issues](https://github.com/gamma/free-roku-videowall/issues). Für Entwickler: [Build-Anleitung](docs/development.md).
 
 Fernbedienung: Zurück verlässt die App; Play pausiert Videos bzw. setzt sie fort, Vorlauf/Rücklauf/Replay springen zehn Sekunden. Roku-Systemtasten bleiben verfügbar. Keine eigenen Bedienelemente. Die Prüfung am Gerät steht noch aus.
+
+[Teststand und Geräteprüfungen](docs/testing.md).
 
 ## Lizenz
 

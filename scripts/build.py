@@ -11,7 +11,8 @@ root = Path(__file__).resolve().parents[1]
 files = [root / name for name in ('manifest', 'LICENSE', 'NOTICE')]
 for folder in ('source', 'components', 'images'):
     files.extend(path for path in sorted((root / folder).rglob('*'))
-                 if not path.name.startswith('.') and (folder != 'images' or args.include_local_frames))
+                 if not path.name.startswith('.') and
+                 (path.relative_to(root).parts[:2] != ('images', 'endframes') or args.include_local_frames))
 for path in files:
     if path.suffix == '.xml':
         ET.parse(path)
