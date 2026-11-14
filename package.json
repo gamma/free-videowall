@@ -1,6 +1,6 @@
 {
-  "name": "free-roku-videowall",
-  "version": "1.0.14",
+  "name": "free-videowall",
+  "version": "1.0.15",
   "private": true,
   "license": "Apache-2.0",
   "scripts": {

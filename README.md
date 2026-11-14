@@ -6,7 +6,9 @@
 
 A free, open-source USB video and photo player for Roku devices with USB media support. No menus. No ads. No account inside the app. Put your files and an M3U playlist on a USB stick, open the app, and it plays them in a loop.
 
-**Development preview:** not yet available in the Roku Streaming Store. Installation currently requires Roku developer mode. [Download the preview](https://github.com/gamma/free-roku-videowall/releases) · [Deutsch](README.de.md)
+**Development preview:** not yet available in the Roku Streaming Store. Installation currently requires Roku developer mode. [Download the preview](https://github.com/gamma/free-videowall/releases) · [Deutsch](README.de.md)
+
+**Platforms:** Roku is the currently usable development preview. A Samsung Tizen version is being developed separately and is not yet part of the regular release. Free Videowall is the project name for both platforms.
 
 ## Start here
 
@@ -69,7 +71,7 @@ The blend uses the previous video's still end frame and the next video's still s
 - The preview suppresses the screensaver while open. TV sleep timers are separate.
 - This is a player, not a locked kiosk. Roku Home and TV controls remain available.
 
-Want a regular Store installation? See the [publishing status](docs/publishing.md). Bugs and suggestions: [GitHub Issues](https://github.com/gamma/free-roku-videowall/issues). Build instructions: [development](docs/development.md).
+Want a regular Store installation? See the [publishing status](docs/publishing.md). Bugs and suggestions: [GitHub Issues](https://github.com/gamma/free-videowall/issues). Build instructions: [development](docs/development.md).
 
 Remote: Back exits; Play toggles video pause, forward/rewind/replay request ten-second seeks. Roku system keys remain available. No custom controls are displayed. Device verification is still pending.
 
