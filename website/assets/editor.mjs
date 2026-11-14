@@ -1,5 +1,5 @@
 import {collectPaths} from './folder-drop.mjs';
-import {parse, serialize, move, suggestedRoot} from './playlist-core.mjs';
+import {parse, serialize, move, suggestedRoot, manualEntry} from './playlist-core.mjs';
 const de = document.documentElement.lang === 'de';
 const t = (en, german) => de ? german : en;
 const $ = id => document.getElementById(id);
@@ -72,6 +72,24 @@ async function fileImport(files, folder = false) {
     $('import-text').value = names.join('\n'); importText($('import-text').value, true);
   } catch {status(t('Could not read the selected playlist.', 'Die gewählte Playlist konnte nicht gelesen werden.'));}
 }
+$('add-entry-form').addEventListener('submit', event => {
+  event.preventDefault();
+  try {
+    const item = manualEntry($('new-path').value, $('new-duration').value, $('new-fade').value, $('new-title').value);
+    items.push(item);sync();render();
+    $('add-entry-form').reset();$('new-path').focus();
+    status(t('Entry added at the end: ', 'Eintrag am Ende hinzugefügt: ') + item.path);
+  } catch (error) {
+    const field = error.message;
+    const messages = {
+      path: t('Enter a supported path relative to the USB root, e.g. videos/clip.mp4 or pictures/slide.jpg.', 'Einen unterstützten Pfad relativ zum USB-Hauptverzeichnis eingeben, z. B. videos/clip.mp4 oder pictures/slide.jpg.'),
+      duration: t('Use positive seconds (max. 86400), −1 for a full video, or leave empty for automatic duration.', 'Positive Sekunden (max. 86400), −1 für ein ganzes Video oder leer für automatische Dauer verwenden.'),
+      fade: t('Blend must be between 0 and 10 seconds.', 'Die Blende muss zwischen 0 und 10 Sekunden liegen.')
+    };
+    status(messages[field] || messages.path);
+    $(field === 'duration' ? 'new-duration' : field === 'fade' ? 'new-fade' : 'new-path').focus();
+  }
+});
 $('import-replace').onclick = () => importText($('import-text').value);
 $('import-add').onclick = () => importText($('import-text').value, true);
 $('load-demo').onclick = () => { $('usb-root').value = ''; $('import-text').value = demo; importText(demo); };

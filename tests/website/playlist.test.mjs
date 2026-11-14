@@ -41,3 +41,12 @@ test('Reorder keeps item metadata and loop order intact', () => {
   assert.deepEqual(items.map(i=>i.path),['two.jpg','one.mp4','three.mkv']);
   assert.equal(parse(serialize(items)).items[0].duration,17);
 });
+
+test('manual entries default by kind, keep metadata and allow repeated paths', async () => {
+  const {manualEntry} = await import('../../website/assets/playlist-core.mjs');
+  const items = [manualEntry('videos/a.mp4'),manualEntry('pictures/ü space.jpg','8','2','Interlude'),manualEntry('videos/a.mp4','12','0')];
+  assert.equal(items[0].duration,-1);assert.equal(manualEntry('slide.png').duration,10);
+  const result=parse(serialize(items)).items;
+  assert.equal(result.length,3);assert.equal(result[1].duration,8);assert.equal(result[1].fade,2);assert.equal(result[2].fade,0);
+  for (const args of [['../a.mp4'],['https://host/a.mp4'],['/Users/a.mp4'],['no.txt'],['a.mp4\nb.mp4'],['a.jpg','-1'],['a.mp4','0'],['a.mp4','5','11']]) assert.throws(()=>manualEntry(...args));
+});
