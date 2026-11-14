@@ -34,61 +34,81 @@ Es gibt keine Netzwerk-Medienquelle und keine Schreibzugriffe auf den Stick.
 Im Prototyp werden absolute Pfade sowie `..` abgelehnt; übliche relative Pfade
 wie `videos/test.mp4` funktionieren. Das ist enger als der Roku-Parser.
 
-## Lokal prüfen und vorbereiten
+## Im Docker-Container bauen
 
-Node.js 18+ und Python 3.9+:
+Auf dem Host werden Docker und Python 3.9+ für den Aufruf benötigt; das SDK
+wird ausschließlich im Container installiert. Node.js 18+ ist nur für lokale
+Tests nötig. Auf Apple Silicon wird `linux/amd64` emuliert.
 
 ```sh
-npm run test:tizen
-node --check platforms/tizen/js/app.js
+npm run build:tizen-image
 npm run build:tizen
+npm run test:tizen
 ```
 
-`dist/tizen/` enthält ausschließlich die App, Lizenztexte und das gemeinsame
-Icon. Das ist **noch kein installierbares, signiertes WGT**. Zertifikate und
-lokale SDK-Dateien gehören nicht ins Repository.
+`tools/tizen/Dockerfile` ist die Tizen-SDK-10-Variante unseres Forks von
+[vitalets/docker-tizen-webos-sdk](https://github.com/gamma/docker-tizen-webos-sdk/tree/48662ef).
+Das bisherige kombinierte Image verwendet Studio 5.5 und benötigt ein separates
+LG-Archiv. Die neue Variante enthält nur Tizen und keine Beispielzertifikate.
+Beim Image-Build wird die SDK-Lizenz durch `--accept-license` angenommen.
 
-## Auf dem eigenen TV installieren
+`build:tizen` führt Dateivorbereitung, `tizen build-web` und das Packen im
+Container aus. Ergebnis: `dist/free-videowall-tizen-unsigned.wgt` und
+`dist/tizen/.buildResult/`. Das WGT ist **unsigniert**, noch nicht installierbar.
+`npm run stage:tizen` bereitet bei Bedarf nur die Dateien vor.
 
-Benötigt Samsung Tizen Studio mit TV-Erweiterung und Samsung Certificate
-Extension sowie ein Samsung-Zertifikatsprofil mit der DUID des Testfernsehers.
-Auf diesem Entwicklungsrechner sind `tizen` und `sdb` derzeit nicht im PATH.
+Die Docker-Aufrufe verwenden BuildKit. Ausschließlich für den hier vorhandenen
+HTTP-Loopback-Daemon `127.0.0.1:4243` entfernt der Wrapper widersprüchliche
+TLS-Umgebungsvariablen für den Kindprozess. Andere Docker-Verbindungen behalten
+ihre TLS-Konfiguration.
 
-1. Am TV den Entwicklermodus aktivieren, die IP des Entwicklungsrechners
-   eintragen und den TV nach Samsung-Anleitung neu starten. TV und Rechner
-   müssen sich erreichen können.
-2. Mit dem TV verbinden und den Zielnamen ermitteln:
+## TV-Verbindung und Signieren
 
-   ```sh
-   sdb connect TV_IP:26101
-   tizen list target
-   ```
+CLI-Aufrufe laufen ebenfalls im Container:
 
-3. Samsung-Zertifikatsprofil erstellen und die Installation für den TV erlauben.
-   `dist/tizen` als bestehendes Web-App-Projekt in Tizen Studio verwenden oder
-   mit der CLI bauen und mit dem eigenen Profil signieren:
+```sh
+python3 scripts/tizen_docker.py cli -- sdb version
+python3 scripts/tizen_docker.py cli -- bash -ec 'sdb connect 192.168.177.137:26101; sdb devices'
+```
 
-   ```sh
-   tizen build-web -- dist/tizen
-   tizen package -t wgt -s DEIN_PROFIL -- dist/tizen/.buildResult
-   tizen install -n FreeVideowall.wgt -t DEIN_TV -- dist/tizen/.buildResult
-   tizen run -p FreeVidWal.Player -t DEIN_TV
-   ```
+Die IP ist die aktuelle Adresse des Test-TVs und kann sich ändern. Für jeden
+kurzlebigen Container die SDB-Verbindung neu aufbauen. Der TV muss im
+Entwicklermodus sein und die aktuelle LAN-IP des Macs als Host-IP kennen.
+Docker muss vom Container aus das TV-Netz erreichen können.
 
-   Beim Installieren `FreeVideowall.wgt` durch den tatsächlich erzeugten
-   Paketdateinamen ersetzen. Diese Schritte wurden hier mangels SDK/TV nicht
-   ausgeführt. SDK-Oberflächen nur in einer Offstage-Sitzung öffnen.
+Für die Installation ein Samsung-Zertifikatsprofil mit der DUID des TVs erstellen
+und die Installation für dieses Gerät erlauben. Zertifikate und Passwörter
+gehören weder in Git noch in das Image. Das Docker-Volume
+`free-videowall-tizen-data` erhält Profile zwischen Container-Aufrufen.
+Private Zertifikatsdateien können über `TIZEN_CERT_DIR` schreibgeschützt unter
+`/certs` eingebunden werden; das Profil muss diese Containerpfade verwenden.
 
-4. Einen vom TV lesbaren USB-Stick mit `playlist.m3u`, einem kurzen H.264/AAC-
-   MP4 und einem JPG vorbereiten. Beide Dateien über relative Pfade referenzieren.
-   Für Videoblenden auf dem Rechner mit installiertem FFmpeg vorbereiten:
+```sh
+TIZEN_CERT_DIR=/absoluter/pfad/zu/deinen/zertifikaten \
+  python3 scripts/tizen_docker.py cli -- tizen package -t wgt -s DEIN_PROFIL -- dist/tizen/.buildResult
+```
 
-   ```sh
-   python3 scripts/prepare_usb.py /Volumes/DEIN_STICK/playlist.m3u
-   ```
+Das ist der Signieraufruf für ein bereits eingerichtetes Profil; er erstellt kein
+Samsung-Zertifikat. Erst das signierte WGT kann auf dem TV installiert werden.
+Installation und App-Start sind getrennte Schritte nach erfolgreicher Signierung.
+GUI-Werkzeuge für Konto/Zertifikate nur gemäß den aktiven Offstage-Regeln öffnen.
 
-   Das Skript legt die Hilfsbilder neben die Videos auf den Stick. Bilder
-   benötigen keine Vorbereitung.
+Für Videoblenden auf dem Rechner mit FFmpeg vorbereiten:
+
+```sh
+python3 scripts/prepare_usb.py /Volumes/DEIN_STICK/playlist.m3u
+```
+
+## Verifizierter Stand (14. November 2026)
+
+- SDK-10-Image unter Docker auf Apple Silicon mit AMD64-Emulation gebaut;
+  `sdb 4.2.36`, `Tizen CLI 2.5.25`.
+- `npm run build:tizen-image` und `npm run build:tizen` erfolgreich.
+- Unsigned WGT auf ZIP-Integrität, Konfiguration und erforderliche Assets geprüft.
+- SDB verbindet aus dem Container zu `192.168.177.137:26101` und erkennt
+  `GU55DU7170UXZG`; Gerätefähigkeiten konnten gelesen werden.
+- Elf Headless-Tests der Samsung-Playerlogik bestanden.
+- Noch nicht geprüft: Samsung-Signierung, Installation und sichtbare Wiedergabe.
 
 ## Abnahme am Gerät
 

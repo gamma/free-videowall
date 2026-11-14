@@ -8,8 +8,10 @@
     "test": "brs --root tests source/playlist.brs tests/playlist.brs",
     "build": "python3 scripts/build.py",
     "test:tizen": "node --test platforms/tizen/tests/*.test.js",
-    "build:tizen": "python3 scripts/build_tizen.py",
-    "test:website": "node --test tests/website/*.test.mjs"
+    "build:tizen": "python3 scripts/tizen_docker.py build",
+    "test:website": "node --test tests/website/*.test.mjs",
+    "stage:tizen": "python3 scripts/build_tizen.py",
+    "build:tizen-image": "python3 scripts/tizen_docker.py image"
   },
   "devDependencies": {
     "brighterscript": "0.73.8",
