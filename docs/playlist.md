@@ -51,7 +51,7 @@ Das Bild wird acht Sekunden gezeigt (einschließlich der eingehenden Blende). Na
 
 ### Visual workshop / Visuelle Werkstatt
 
-[English editor](https://gamma.github.io/free-roku-videowall/editor.html) · [Deutscher Editor](https://gamma.github.io/free-roku-videowall/de/editor.html)
+[English editor](https://videowall.gh.gammaproduction.de/editor.html) · [Deutscher Editor](https://videowall.gh.gammaproduction.de/de/editor.html)
 
 - Paste an M3U or one filename per line. On Windows, use **Copy as path**; on macOS, **Option+Cmd+C** copies pathnames. Normal file-copy clipboard contents vary by browser and OS.
 - For full computer paths, specify the stick root (e.g. `E:` or `/Volumes/USB`). Check that the result matches the actual USB folders.

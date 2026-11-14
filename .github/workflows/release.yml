@@ -74,7 +74,7 @@ jobs:
           fi
           gh release create "$RELEASE_TAG" dist/free-videowall.zip dist/store-assets.zip dist/SHA256SUMS \
             --verify-tag --prerelease --title "Free Videowall $RELEASE_TAG" \
-            --notes 'Development preview / Entwicklungsversion. Requires Roku developer mode; not a Roku Store release. EN/DE setup and playlist instructions are in the README. No user media included. Website: https://gamma.github.io/free-roku-videowall/ . Store text and public artwork are in store-assets.zip.'
+            --notes 'Development preview / Entwicklungsversion. Requires Roku developer mode; not a Roku Store release. EN/DE setup and playlist instructions are in the README. No user media included. Website: https://videowall.gh.gammaproduction.de/ . Store text and public artwork are in store-assets.zip.'
 
   website:
     needs: release

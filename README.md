@@ -83,4 +83,4 @@ The license covers this project's code and documentation, not your media. Indepe
 
 Project website and GitHub Pages setup: [website guide](docs/website.md).
 
-[Build a playlist visually](https://gamma.github.io/free-roku-videowall/editor.html): paste filenames or an M3U, arrange videos and pictures, preview placeholders, download `playlist.m3u`. Runs locally in your browser.
+[Build a playlist visually](https://videowall.gh.gammaproduction.de/editor.html): paste filenames or an M3U, arrange videos and pictures, preview placeholders, download `playlist.m3u`. Runs locally in your browser.

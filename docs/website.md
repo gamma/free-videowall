@@ -6,7 +6,7 @@ GitHub Pages is deployed by **Release preview** after the package checks and Git
 
 GitHub Pages must use **GitHub Actions** as its source. The repository is configured for this; for a fork, select it under **Settings → Pages**.
 
-Public base URL: `https://gamma.github.io/free-roku-videowall/`.
+Public base URL: `https://videowall.gh.gammaproduction.de/`.
 
 Roku dashboard URLs after deployment:
 
