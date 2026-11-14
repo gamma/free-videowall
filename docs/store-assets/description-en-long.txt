@@ -1,0 +1,11 @@
+Your USB stick. Your playlist. Just play.
+
+Free Videowall plays your own videos and pictures in a repeating loop. No menus to navigate. No ads, subscriptions, in-app purchases or paid upgrades. All features are free. No account inside the app.
+
+Copy your files onto a compatible USB stick and put playlist.m3u in its root folder. An M3U is simply a text file listing what to play. Files can live in subfolders. Mix videos and pictures, choose their order and set how long each picture stays on screen.
+
+Optional 1.5-second picture blends also work from the last item back to the first. Prepare small start and end images for videos with the free computer helper. Transitions blend still frames; audio is not crossfaded.
+
+Use the remote to pause, resume or seek within a video. Playback begins when you open the app. A device with USB media support and compatible files is required; automatic launch when the TV powers on is not guaranteed.
+
+Free also means freedom: the source code is available under Apache License 2.0. Use, study, change and share it, including for commercial use, under the license terms. Setup instructions and support are on the project website and GitHub.

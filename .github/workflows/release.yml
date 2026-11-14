@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing version tag, e.g. v1.0.6'
+        description: 'Existing version tag, e.g. v1.0.7'
         required: true
         type: string
       publish:
@@ -43,19 +43,23 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: python3 scripts/build.py
+      - run: python3 scripts/verify_website.py
+      - name: Bundle Store listing assets
+        run: python3 -c "import shutil; shutil.make_archive('dist/store-assets', 'zip', 'docs/store-assets')"
       - name: Validate public release
         env:
           RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           python3 release-tools/scripts/verify_release.py --root . --tag "$RELEASE_TAG"
           cd dist
-          sha256sum free-videowall.zip > SHA256SUMS
+          sha256sum free-videowall.zip store-assets.zip > SHA256SUMS
       - uses: actions/upload-artifact@v4
         with:
           name: release-${{ inputs.tag || github.ref_name }}
           path: |
             dist/free-videowall.zip
             dist/SHA256SUMS
+            dist/store-assets.zip
       - name: Publish GitHub preview
         if: github.event_name == 'push' || inputs.publish
         env:
@@ -67,6 +71,35 @@ jobs:
             echo 'Release already exists; preserving its files.'
             exit 0
           fi
-          gh release create "$RELEASE_TAG" dist/free-videowall.zip dist/SHA256SUMS \
+          gh release create "$RELEASE_TAG" dist/free-videowall.zip dist/store-assets.zip dist/SHA256SUMS \
             --verify-tag --prerelease --title "Free Videowall $RELEASE_TAG" \
-            --notes 'Development preview / Entwicklungsversion. Requires Roku developer mode; not a Roku Store release. EN/DE setup and playlist instructions are in the README. No user media included.'
+            --notes 'Development preview / Entwicklungsversion. Requires Roku developer mode; not a Roku Store release. EN/DE setup and playlist instructions are in the README. No user media included. Website: https://gamma.github.io/free-roku-videowall/ . Store text and public artwork are in store-assets.zip.'
+
+  website:
+    needs: release
+    if: github.event_name == 'push' || inputs.publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 scripts/verify_website.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: website
+      - uses: actions/deploy-pages@v4
+        id: deployment

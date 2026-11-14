@@ -1,0 +1,11 @@
+Dein USB-Stick. Deine Playlist. Einfach abspielen.
+
+Free Videowall spielt deine eigenen Videos und Bilder in Endlosschleife. Ohne Menüs. Ohne Werbung, Abo, In-App-Käufe oder kostenpflichtige Extras. Alle Funktionen sind kostenlos. Kein Konto in der App nötig.
+
+Kopiere die Dateien auf einen kompatiblen USB-Stick und lege playlist.m3u im Hauptverzeichnis ab. Eine M3U ist eine einfache Textdatei, die auflistet, was abgespielt wird. Medien dürfen in Unterordnern liegen. Mische Videos und Bilder, bestimme die Reihenfolge und lege die Anzeigedauer der Bilder fest.
+
+Optionale Bildblenden von 1,5 Sekunden funktionieren auch vom letzten zum ersten Eintrag. Ein kostenloses Hilfsprogramm erzeugt die nötigen Start- und Endbilder der Videos am Computer. Die Blende nutzt Standbilder; der Ton wird nicht überblendet.
+
+Mit der Fernbedienung Videos pausieren, fortsetzen oder darin vor- und zurückspringen. Die Wiedergabe beginnt beim Öffnen der App. Benötigt werden USB-Medienunterstützung und kompatible Dateien. Ein automatischer Start beim Einschalten des TVs ist nicht garantiert.
+
+Frei heißt auch: Der Quellcode steht unter Apache License 2.0. Du darfst die Software nach deren Bedingungen nutzen, untersuchen, verändern und weitergeben, auch gewerblich. Anleitung und Hilfe findest du auf der Projektwebsite und auf GitHub.

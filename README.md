@@ -80,3 +80,5 @@ Remote: Back exits; Play toggles video pause, forward/rewind/replay request ten-
 Copyright 2026 Gerry Weißbach. [Apache License 2.0](LICENSE).
 
 The license covers this project's code and documentation, not your media. Independent project; not affiliated with Roku, Inc.
+
+Project website and GitHub Pages setup: [website guide](docs/website.md).

@@ -1,0 +1,1 @@
+Play your USB videos and pictures in a loop. A simple M3U playlist sets the order and picture duration. Completely free and open source: no ads, subscriptions, purchases or account in the app. Requires a Roku device with USB media support.

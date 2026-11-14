@@ -1,0 +1,1 @@
+Eigene USB-Videos und Bilder in Endlosschleife. Eine einfache M3U steuert Reihenfolge und Bilddauer. Komplett kostenlos und quelloffen: keine Werbung, Abos, Käufe oder Konten in der App. Benötigt einen Roku mit USB-Medienunterstützung.

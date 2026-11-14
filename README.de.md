@@ -80,3 +80,5 @@ Fernbedienung: Zurück verlässt die App; Play pausiert Videos bzw. setzt sie fo
 Copyright 2026 Gerry Weißbach. [Apache-Lizenz 2.0](LICENSE).
 
 Die Lizenz gilt für Code und Dokumentation dieses Projekts, nicht für deine Medien. Unabhängiges Projekt; keine Verbindung zu Roku, Inc.
+
+Projektwebsite und GitHub-Pages-Einrichtung: [Website-Anleitung](docs/website.md).

@@ -15,3 +15,5 @@ Free Videowall liest Playlist, Medien und optionale Blendenbilder vom USB-Stick 
 Zur Fehlersuche können Meldungen in der lokalen Roku-Entwicklerkonsole Playlist-Pfade, Dateinamen und Wiedergabefehler enthalten. Keine Protokolle mit privaten Angaben öffentlich posten.
 
 Roku-Betriebssystem und GitHub sind eigenständige Dienste mit eigenen Datenschutzregelungen. Diese Beschreibung betrifft die App, nicht jede Verarbeitung durch Gerät oder Hosting-Anbieter. Projektkontakt: [GitHub Issues](https://github.com/gamma/free-roku-videowall/issues); dort keine persönlichen oder sensiblen Daten angeben.
+
+Website privacy notices / Datenschutzhinweise der Website: [English](../website/privacy.html) · [Deutsch](../website/de/privacy.html). Deployment URLs: [website setup](website.md).
