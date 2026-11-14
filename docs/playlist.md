@@ -73,3 +73,9 @@ Am einfachsten: USB-Hauptordner in die Werkstatt ziehen. Die Seite durchsucht Un
 At the end of the visual playlist, **Add another entry** appends a USB-relative video or picture path. An optional title, duration and outgoing blend can be set. Empty duration means a full video or a ten-second picture. Positive seconds limit a video or set picture duration; −1 means a full video. The same file may appear more than once. New entries can be reordered or removed like imported ones. Adding an entry does not copy the media: the referenced file must already exist on the USB stick.
 
 Am Ende der visuellen Liste hängt **Weiteren Eintrag hinzufügen** ein Video oder Bild per USB-relativem Dateipfad an. Titel, Dauer und Blende sind einstellbar. Leere Dauer bedeutet ganzes Video oder zehn Sekunden Bild. Positive Sekunden setzen Videolimit/Bilddauer, −1 spielt das ganze Video. Dieselbe Datei darf mehrfach vorkommen. Neue Einträge lassen sich wie importierte sortieren und entfernen. Die Medien werden nicht mitkopiert; die Datei muss auf dem Stick vorhanden sein.
+
+### Automatic text import / Automatische Textübernahme
+
+Pasting or editing filenames/M3U updates the playlist immediately, without an Apply button. Clearing the text empties the playlist. Reordering or editing cards updates the text too. To extend an existing list, drop more media or use the manual entry form below; a pasted replacement list replaces the current order. Invalid text shows a message and retains the last usable list.
+
+Dateinamen oder M3U einfügen/bearbeiten aktualisiert die Playlist sofort, ohne Übernehmen-Knopf. Leerer Text leert die Playlist. Sortieren oder Bearbeiten der Einträge aktualisiert auch den Text. Zum Ergänzen weitere Medien ablegen oder unten manuell hinzufügen; eine neu eingefügte Textliste ersetzt die bisherige Reihenfolge. Ungültiger Text zeigt einen Hinweis und behält die letzte brauchbare Liste.

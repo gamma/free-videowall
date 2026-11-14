@@ -11,8 +11,9 @@ function stop() {
   $('preview-play').textContent = t('Play preview', 'Vorschau starten');
   $('preview-progress').value = 0;
 }
-function sync() {
+function sync(updateSource = true) {
   stop(); $('m3u-output').value = serialize(items);
+  if (updateSource) $('import-text').value = $('m3u-output').value;
   $('item-count').textContent = `${items.length} ${t('items', 'Einträge')}`;
   $('download').disabled = $('copy').disabled = $('preview-play').disabled = !items.length;
   if (items.length) show(0, false);
@@ -51,13 +52,14 @@ function render() {
   });
 }
 function importText(text, append = false) {
+  if (!text.trim() && !append) {items = [];sync(false);render();status('');return;}
   if (text.length > 1024 * 1024) {status(t('List is too large (limit: 1 MB).', 'Liste zu groß (maximal 1 MB).'));return;}
   const root = $('usb-root').value.trim() || suggestedRoot(text);
   if (!$('usb-root').value) $('usb-root').value = root;
   const result = parse(text, root);
   if (!result.items.length) {status(t('No supported entries found. Use one filename per line or paste an M3U. Check the USB root for full computer paths.', 'Keine unterstützten Einträge gefunden. Ein Dateiname pro Zeile oder eine M3U. Bei vollständigen Rechnerpfaden das USB-Hauptverzeichnis prüfen.'));return;}
   items = append ? [...items, ...result.items] : result.items;
-  sync(); render();
+  sync(append); render();
   status(`${root ? t('Check USB root: ', 'USB-Hauptverzeichnis prüfen: ') + root + '. ' : ''}${result.items.length} ${t('entries imported.', 'Einträge übernommen.')} ${result.warnings.length ? `${result.warnings.length} ${t('lines skipped (unsupported files, helper images or invalid paths).', 'Zeilen übersprungen (unbekannte Dateien, Hilfsbilder oder ungültige Pfade).')}` : ''}`);
 }
 async function fileImport(files, folder = false) {
@@ -90,8 +92,8 @@ $('add-entry-form').addEventListener('submit', event => {
     $(field === 'duration' ? 'new-duration' : field === 'fade' ? 'new-fade' : 'new-path').focus();
   }
 });
-$('import-replace').onclick = () => importText($('import-text').value);
-$('import-add').onclick = () => importText($('import-text').value, true);
+$('import-text').addEventListener('input', () => importText($('import-text').value));
+$('usb-root').addEventListener('input', () => importText($('import-text').value));
 $('load-demo').onclick = () => { $('usb-root').value = ''; $('import-text').value = demo; importText(demo); };
 $('clear').onclick = () => {items = [];sync();render();status(t('Playlist cleared.', 'Playlist geleert.'));};
 $('media-files').onchange = e => {fileImport(e.target.files); e.target.value = '';};
@@ -115,7 +117,7 @@ zone.addEventListener('drop', async e => {
   const text = e.dataTransfer.getData('text/plain');
   if (!entries.some(entry => entry?.isDirectory)) {
     if (files.length) await fileImport(files);
-    else $('import-text').value = text;
+    else { $('import-text').value = text; importText(text); }
     return;
   }
   if (entries.some(entry => !entry)) {status(t('Your browser cannot read all dropped folders. Use Choose USB folder instead.', 'Der Browser kann nicht alle abgelegten Ordner lesen. Bitte USB-Ordner wählen verwenden.'));return;}
