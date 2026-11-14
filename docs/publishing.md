@@ -38,3 +38,5 @@ Für eine normale Installation brauchen wir dein Roku-Entwicklerkonto, eine App 
 Vorher müssen wir Zurück-/Options-Taste, Autoplay-Einstellung und die dauerhafte Bildschirmschonersperre mit den Store-Regeln in Einklang bringen. Außerdem: USB-Testverfahren für die Prüfung klären, gemischte Bilder/Videos auf weiteren Geräten testen und die Vorbereitung der Blendenbilder vereinfachen. Das benötigte FFmpeg-Hilfsprogramm ist derzeit ein zusätzlicher Nutzerschritt.
 
 Eine Store- oder Beta-Einreichung wurde noch nicht vorgenommen. Die laufende lokale App wurde hierfür nicht umgestellt. Die oben verlinkten offiziellen Roku-Seiten beschreiben den aktuellen Prozess.
+
+Release preparation is automated; see [automation](automation.md). / Die Release-Vorbereitung ist automatisiert; siehe [Automatisierung](automation.md#deutsch).

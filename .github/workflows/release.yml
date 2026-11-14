@@ -1,0 +1,72 @@
+name: Release preview
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing version tag, e.g. v1.0.6'
+        required: true
+        type: string
+      publish:
+        description: 'Create a public GitHub prerelease after checks pass'
+        default: false
+        type: boolean
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      # The workflow may be dispatched against a tag predating this workflow.
+      # Keep release validation in the workflow revision, source in the tag.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: release-tools
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: python3 scripts/build.py
+      - name: Validate public release
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          python3 release-tools/scripts/verify_release.py --root . --tag "$RELEASE_TAG"
+          cd dist
+          sha256sum free-videowall.zip > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ inputs.tag || github.ref_name }}
+          path: |
+            dist/free-videowall.zip
+            dist/SHA256SUMS
+      - name: Publish GitHub preview
+        if: github.event_name == 'push' || inputs.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo 'Release already exists; preserving its files.'
+            exit 0
+          fi
+          gh release create "$RELEASE_TAG" dist/free-videowall.zip dist/SHA256SUMS \
+            --verify-tag --prerelease --title "Free Videowall $RELEASE_TAG" \
+            --notes 'Development preview / Entwicklungsversion. Requires Roku developer mode; not a Roku Store release. EN/DE setup and playlist instructions are in the README. No user media included.'
