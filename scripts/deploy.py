@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import subprocess
 import urllib.request
+import urllib.error
 import uuid
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -21,7 +22,8 @@ password = os.environ.get('ROKU_PASSWORD') or getpass.getpass('Roku developer pa
 url = 'http://' + args.host + '/plugin_install'
 manager = urllib.request.HTTPPasswordMgrWithDefaultRealm()
 manager.add_password('rokudev', url, 'rokudev', password)
-opener = urllib.request.build_opener(urllib.request.HTTPDigestAuthHandler(manager))
+digest = urllib.request.HTTPDigestAuthHandler(manager)
+opener = urllib.request.build_opener(digest)
 boundary = uuid.uuid4().hex
 body = ('--' + boundary + '\r\nContent-Disposition: form-data; name="mysubmit"\r\n\r\nInstall\r\n'
         '--' + boundary + '\r\nContent-Disposition: form-data; name="archive"; filename="free-videowall.zip"\r\n'
@@ -29,6 +31,25 @@ body = ('--' + boundary + '\r\nContent-Disposition: form-data; name="mysubmit"\r
 body += (root / 'dist/free-videowall.zip').read_bytes()
 body += ('\r\n--' + boundary + '--\r\n').encode()
 request = urllib.request.Request(url, data=body, headers={'Content-Type': 'multipart/form-data; boundary=' + boundary})
+# Roku can close an unauthenticated upload before a large body is sent,
+# resulting in BrokenPipeError. Obtain the digest challenge with a small GET
+# and authenticate the initial POST rather than waiting to resend its body.
+try:
+    with urllib.request.urlopen(url, timeout=10):
+        challenge = None
+except urllib.error.HTTPError as error:
+    if error.code != 401:
+        raise
+    challenge = error.headers.get('WWW-Authenticate', '')
+if challenge:
+    scheme, value = challenge.split(' ', 1)
+    if scheme.lower() != 'digest':
+        raise RuntimeError('Roku installer did not offer Digest authentication')
+    fields = urllib.request.parse_keqv_list(urllib.request.parse_http_list(value))
+    authorization = digest.get_authorization(request, fields)
+    if not authorization:
+        raise RuntimeError('Could not authenticate Roku installer upload')
+    request.add_unredirected_header('Authorization', 'Digest ' + authorization)
 response = opener.open(request, timeout=60).read().decode()
 (root / 'dist/deploy-response.html').write_text(response)
 # HTTP 200 alone does not mean the Roku accepted/compiled the package.
