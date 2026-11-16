@@ -1,7 +1,7 @@
 /* Samsung-only adapter. No Roku source or packaging depends on this directory. */
 (function () {
     "use strict";
-    var player, items = [], index = 0, timer, generation = 0, hidden = false;
+    var player, items = [], index = 0, timer, generation = 0, hidden = false, advancing = false;
     var slide = document.getElementById("slide"), status = document.getElementById("status");
     var transitions = window.VideowallTransitions(document.getElementById("outgoing"), document.getElementById("incoming"));
     function message(text) {
@@ -12,12 +12,22 @@
     function stop(preserveTransition) {
         if (!preserveTransition) transitions.clear();
         generation++;
+        advancing = false;
         clearTimeout(timer);
         slide.onload = slide.onerror = null;
         slide.style.display = "none";
         slide.removeAttribute("src");
         if (player) {
-            try { player.close(); } catch (error) { console.log(error); }
+            try {
+                var overlay = document.getElementById("outgoing");
+                if (player.getState() !== "NONE") {
+                    // Keep the display buffer intact across the decoder reset.
+                    // A DOM overlay alone does not prevent a black flash on TV.
+                    try { player.setVideoStillMode(preserveTransition && overlay.style.display === "block" && overlay.style.opacity === "1" ? "true" : "false"); }
+                    catch (unsupported) { console.log("Video still mode: " + unsupported); }
+                }
+                player.close();
+            } catch (error) { console.log(error); }
         }
     }
     function retry(error) {
@@ -26,15 +36,25 @@
         if (!hidden) timer = setTimeout(scan, 5000);
     }
     function next() {
+        if (advancing || hidden) return;
+        advancing = true;
         transitions.hold();
-        index++;
-        if (index >= items.length) scan(true);
-        else play();
+        var token = generation;
+        // Layout alone does not paint the still before AVPlay clears its plane.
+        // Keep the decoder open until the overlay has had a rendering opportunity.
+        window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(function () {
+                if (token !== generation || hidden) return;
+                index++;
+                if (index >= items.length) scan(true);
+                else play();
+            });
+        });
     }
     function play() {
         stop(true);
         if (hidden) return;
-        var item = items[index], token = generation;
+        var item = items[index], token = generation, videoRevealed = false;
         function failed(error) {
             if (token !== generation) return;
             stop();
@@ -64,7 +84,14 @@
                 onstreamcompleted: function () { if (token === generation) next(); },
                 onerror: failed,
                 oncurrentplaytime: function (milliseconds) {
-                    if (token === generation && item.duration > 0 && milliseconds >= item.duration * 1000) next();
+                    if (token !== generation) return;
+                    // play() returning is not evidence of a decoded video frame.
+                    if (!videoRevealed && milliseconds > 0) {
+                        videoRevealed = true;
+                        try { player.setVideoStillMode("false"); } catch (unsupported) { console.log("Video still mode: " + unsupported); }
+                        transitions.reveal(item, function () {});
+                    }
+                    if (item.duration > 0 && milliseconds >= item.duration * 1000) next();
                 }
             });
             player.setDisplayRect(0, 0, 1920, 1080);
@@ -73,15 +100,19 @@
             player.prepareAsync(function () {
                 if (token !== generation) return;
                 clearTimeout(timer);
-                try { player.play(); message(""); transitions.reveal(item, function () {}); } catch (error) { failed(error); }
+                try { player.play(); message(""); } catch (error) { failed(error); }
             }, failed);
         } catch (error) { failed(error); }
     }
     function scan(preserveTransition) {
         stop(preserveTransition === true);
         if (hidden) return;
-        var token = generation;
-        message("Suche USB-Playlist …");
+        var token = generation, issue = "Kein gemounteter USB-Speicher erkannt.";
+        function detail(stage, err) {
+            issue = stage + (err ? " (" + (err.message || err.name || String(err)) + ")" : "");
+            console.log("Free Videowall USB: " + issue);
+        }
+        if (preserveTransition !== true) message("Suche USB-Playlist …");
         function valid() { return token === generation && !hidden; }
         function error(err) { if (valid()) retry(err); }
         // Also recover if a device API never calls its completion callback.
@@ -93,12 +124,13 @@
             }).sort(function (a, b) { return a.label.localeCompare(b.label); });
             function storageAt(n) {
                 if (!valid()) return;
-                if (n >= storages.length) { error(); return; }
+                if (n >= storages.length) { error(new Error(issue)); return; }
                 tizen.filesystem.resolve(storages[n].label, function (root) {
                     if (!valid()) return;
                     root.listFiles(function (files) {
                         if (!valid()) return;
                         files = files.filter(function (file) { return !file.isDirectory && /\.m3u8?$/i.test(file.name); });
+                        if (!files.length) detail(storages[n].label + ": Keine M3U/M3U8 im Hauptverzeichnis.");
                         files.sort(function (a, b) {
                             var ap = a.name.toLowerCase() === "playlist.m3u", bp = b.name.toLowerCase() === "playlist.m3u";
                             return ap !== bp ? (ap ? -1 : 1) : a.name.localeCompare(b.name);
@@ -108,8 +140,8 @@
                             if (p >= files.length) { storageAt(n + 1); return; }
                             files[p].readAsText(function (text) {
                                 if (!valid()) return;
-                                var loaded = [];
-                                window.parsePlaylist(text).forEach(function (item) {
+                                var loaded = [], parsed = window.parsePlaylist(text), missing = [];
+                                parsed.forEach(function (item) {
                                     try {
                                         var file = root.resolve(item.path);
                                         if (!file.isDirectory) {
@@ -120,17 +152,20 @@
                                             }
                                             loaded.push(item);
                                         }
-                                    } catch (err) { console.log("Missing USB file: " + item.path); }
+                                    } catch (err) { missing.push(item.path); console.log("Missing USB file: " + item.path + " (" + (err.message || err.name) + ")"); }
                                 });
-                                if (!loaded.length) { playlistAt(p + 1); return; }
+                                if (!loaded.length) {
+                                    detail(files[p].name + (parsed.length ? ": Keine referenzierte Mediendatei gefunden. " + missing.slice(0, 3).join(", ") : ": Keine unterstützten relativen JPG/PNG-/Videopfade enthalten."));
+                                    playlistAt(p + 1); return;
+                                }
                                 items = loaded;
                                 index = 0;
                                 play();
-                            }, function () { playlistAt(p + 1); }, "UTF-8");
+                            }, function (err) { detail(files[p].name + ": Lesen fehlgeschlagen", err); playlistAt(p + 1); }, "UTF-8");
                         }
                         playlistAt(0);
-                    }, function () { storageAt(n + 1); });
-                }, function () { storageAt(n + 1); }, "r");
+                    }, function (err) { detail(storages[n].label + ": Verzeichnis nicht lesbar", err); storageAt(n + 1); });
+                }, function (err) { detail(storages[n].label + ": USB-Zugriff fehlgeschlagen", err); storageAt(n + 1); }, "r");
             }
             storageAt(0);
         }, error);

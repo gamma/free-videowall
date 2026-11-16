@@ -1,15 +1,15 @@
 {
-  "name": "free-roku-videowall",
-  "version": "1.0.9",
+  "name": "free-videowall",
+  "version": "1.0.15",
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
     "check": "bsc --project bsconfig.json",
     "test": "brs --root tests source/playlist.brs tests/playlist.brs",
     "build": "python3 scripts/build.py",
+    "test:website": "node --test tests/website/*.test.mjs",
     "test:tizen": "node --test platforms/tizen/tests/*.test.js",
     "build:tizen": "python3 scripts/tizen_docker.py build",
-    "test:website": "node --test tests/website/*.test.mjs",
     "stage:tizen": "python3 scripts/build_tizen.py",
     "build:tizen-image": "python3 scripts/tizen_docker.py image",
     "test:webos": "node --test platforms/webos/tests/*.test.js",

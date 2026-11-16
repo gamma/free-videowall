@@ -6,7 +6,7 @@ Free Videowall reads the playlist, media files and optional transition images fr
 
 For troubleshooting, local Roku developer-console messages may contain playlist paths, media filenames and playback errors. Do not post logs containing private information in a public issue.
 
-Roku's operating system and GitHub are separate services with their own privacy practices. This statement describes this app, not all processing performed by the device or hosting provider. Project contact: [GitHub Issues](https://github.com/gamma/free-roku-videowall/issues); do not send personal or sensitive data there.
+Roku's operating system and GitHub are separate services with their own privacy practices. This statement describes this app, not all processing performed by the device or hosting provider. Project contact: [GitHub Issues](https://github.com/gamma/free-videowall/issues); do not send personal or sensitive data there.
 
 ## Deutsch
 
@@ -14,6 +14,6 @@ Free Videowall liest Playlist, Medien und optionale Blendenbilder vom USB-Stick 
 
 Zur Fehlersuche können Meldungen in der lokalen Roku-Entwicklerkonsole Playlist-Pfade, Dateinamen und Wiedergabefehler enthalten. Keine Protokolle mit privaten Angaben öffentlich posten.
 
-Roku-Betriebssystem und GitHub sind eigenständige Dienste mit eigenen Datenschutzregelungen. Diese Beschreibung betrifft die App, nicht jede Verarbeitung durch Gerät oder Hosting-Anbieter. Projektkontakt: [GitHub Issues](https://github.com/gamma/free-roku-videowall/issues); dort keine persönlichen oder sensiblen Daten angeben.
+Roku-Betriebssystem und GitHub sind eigenständige Dienste mit eigenen Datenschutzregelungen. Diese Beschreibung betrifft die App, nicht jede Verarbeitung durch Gerät oder Hosting-Anbieter. Projektkontakt: [GitHub Issues](https://github.com/gamma/free-videowall/issues); dort keine persönlichen oder sensiblen Daten angeben.
 
 Website privacy notices / Datenschutzhinweise der Website: [English](../website/privacy.html) · [Deutsch](../website/de/privacy.html). Deployment URLs: [website setup](website.md).
