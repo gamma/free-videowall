@@ -18,6 +18,8 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run test:website
+      - run: npm run test:tizen
+      - run: python3 scripts/test_verify_tizen_release.py
       - run: npm run test:webos
       - run: python3 -m unittest discover -s tests -p 'test_build_webos.py'
       - run: npm run build:webos
