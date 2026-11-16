@@ -6,7 +6,7 @@
 
 Push a version tag matching both `manifest` and `package.json`, for example `v1.0.7`. The **Release preview** workflow installs locked dependencies, checks BrightScript, tests the playlist parser, builds the public ZIP, verifies version/assets/license/private-frame exclusion and publishes a GitHub **prerelease** with SHA-256 checksum.
 
-After successful release checks, the same workflow deploys the EN/DE website from that tag to [GitHub Pages](https://gamma.github.io/free-roku-videowall/). The release also includes `store-assets.zip` with EN/DE listing text and public artwork. Branch pushes and dry runs do not deploy the website.
+After successful release checks, the same workflow deploys the EN/DE website from that tag to [GitHub Pages](https://videowall.gh.gammaproduction.de/). The release also includes `store-assets.zip` with EN/DE listing text and public artwork. Branch pushes and dry runs do not deploy the website.
 
 No developer password, private media, signing key or Roku account is needed for this workflow. Existing releases are preserved. Pull requests never publish releases.
 
@@ -48,7 +48,7 @@ Sources: [Roku packaging](https://developer.roku.com/dev/docs/packaging-channels
 
 Ein Versions-Tag wie `v1.0.7`, passend zu Manifest und `package.json`, startet **Release preview**: Compilerprüfung, Playlist-Tests, öffentlicher Build, Versions-/Paketprüfung und GitHub-Vorschau mit Prüfsumme. Vorhandene Releases bleiben erhalten. Pull Requests veröffentlichen nichts.
 
-Nach erfolgreicher Paketveröffentlichung wird die EN/DE-Website vom selben Tag auf [GitHub Pages](https://gamma.github.io/free-roku-videowall/) veröffentlicht. `store-assets.zip` enthält die Storetexte und öffentlichen Grafiken. Branch-Pushes und Trockenläufe veröffentlichen die Website nicht.
+Nach erfolgreicher Paketveröffentlichung wird die EN/DE-Website vom selben Tag auf [GitHub Pages](https://videowall.gh.gammaproduction.de/) veröffentlicht. `store-assets.zip` enthält die Storetexte und öffentlichen Grafiken. Branch-Pushes und Trockenläufe veröffentlichen die Website nicht.
 
 Ohne Veröffentlichung testen: Actions → Release preview → Run workflow → bestehenden Tag wählen → **publish** ausgeschaltet lassen. Ergebnis ist ein Build-Artefakt. Roku-Zugangsdaten sind dafür nicht erforderlich.
 

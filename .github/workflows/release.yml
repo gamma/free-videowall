@@ -91,7 +91,7 @@ jobs:
             exit 0
           fi
           assets=(dist/free-videowall.zip dist/store-assets.zip dist/SHA256SUMS)
-          notes='Development preview / Entwicklungsversion. Roku ZIP requires developer mode; not a Store release. EN/DE setup and playlist instructions are in the README. No user media included. Store text and public artwork are in store-assets.zip.'
+          notes='Development preview / Entwicklungsversion. Roku ZIP requires developer mode; not a Store release. EN/DE setup and playlist instructions are in the README. No user media included. Website: https://videowall.gh.gammaproduction.de/ . Store text and public artwork are in store-assets.zip.'
           if [ -f dist/free-videowall-tizen-unsigned.wgt ]; then
             assets+=(dist/free-videowall-tizen-unsigned.wgt)
             notes+=$'\n\nSamsung: free-videowall-tizen-unsigned.wgt is UNSIGNED and cannot be installed directly. Sign it with your own Samsung certificates for your target TV; see docs/tizen.md in this tag. Tizen uses its own version from config.xml. No Samsung Store approval is implied. / Samsung-WGT ist unsigniert und muss vor der Installation fuer den Ziel-TV signiert werden.'

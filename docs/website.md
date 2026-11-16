@@ -6,7 +6,7 @@ GitHub Pages is deployed by **Release preview** after the package checks and Git
 
 GitHub Pages must use **GitHub Actions** as its source. The repository is configured for this; for a fork, select it under **Settings → Pages**.
 
-Public base URL: `https://gamma.github.io/free-roku-videowall/`.
+Public base URL: `https://videowall.gh.gammaproduction.de/`.
 
 Roku dashboard URLs after deployment:
 
@@ -24,3 +24,5 @@ Prefix each path with the base URL without its final slash. Privacy and terms ar
 Preview headlessly with `python3 -m http.server 8765 --directory website` and visit `http://localhost:8765/`. To edit content, edit the HTML directly. Store upload descriptions and artwork are in [store-assets](store-assets/README.md).
 
 The browser-only workshop imports filenames/M3U, edits order and timing, exports UTF-8 M3U, and previews placeholders. Run `npm run test:website` for import/export contract tests. Media file contents are never read; only an explicitly selected M3U is read as text.
+
+Voluntary development support links to the owner’s verified [GitHub Sponsors profile](https://github.com/sponsors/gamma). It grants no additional app features; the app remains entirely free. Only a normal external link is used, without an embedded widget or payment processing on this site.

@@ -51,13 +51,31 @@ Das Bild wird acht Sekunden gezeigt (einschließlich der eingehenden Blende). Na
 
 ### Visual workshop / Visuelle Werkstatt
 
-[English editor](https://gamma.github.io/free-roku-videowall/editor.html) · [Deutscher Editor](https://gamma.github.io/free-roku-videowall/de/editor.html)
+[English editor](https://videowall.gh.gammaproduction.de/editor.html) · [Deutscher Editor](https://videowall.gh.gammaproduction.de/de/editor.html)
 
 - Paste an M3U or one filename per line. On Windows, use **Copy as path**; on macOS, **Option+Cmd+C** copies pathnames. Normal file-copy clipboard contents vary by browser and OS.
 - For full computer paths, specify the stick root (e.g. `E:` or `/Volumes/USB`). Check that the result matches the actual USB folders.
-- Choose the USB root folder to preserve subfolder paths. Selecting individual files or dropping them supplies names only, so those files must be in the USB root. Folder import sorts media filenames; it does not import an existing playlist or add helper frame images.
+- Choose the USB root folder to preserve subfolder paths. Selecting or dropping individual files supplies names only, so those files must be in the USB root. Folder import sorts media filenames; it does not import an existing playlist or add helper frame images.
 - Move entries up/down, edit paths, picture durations/video limits and outgoing blend times. Download `playlist.m3u` into the USB root. It replaces your existing playlist only when you save/copy it there yourself.
 - The preview uses generated placeholders; unlimited videos are assigned an illustrative eight seconds. It does not validate codecs, file existence or seamless transitions on your device. It does not generate video frame images.
 - Media contents are neither read nor uploaded. M3U files are read as local text. No persistent storage: download before closing.
 
 Dateinamen/M3U einfügen, mit Pfeilen sortieren, Bilddauer und Blenden anpassen und `playlist.m3u` herunterladen. Windows: **Als Pfad kopieren**; macOS: **Option+Cmd+C**. Normales Kopieren von Dateien funktioniert nicht in jedem Browser gleich. Bei Rechnerpfaden das USB-Hauptverzeichnis angeben; für Unterordner das Hauptverzeichnis des Sticks auswählen. Einzeldatei-Auswahl/Drag-and-drop liefert nur Namen. Die Vorschau zeigt Platzhalter und angenommene Videolaufzeiten, prüft keine echten Dateien oder TV-Kompatibilität und erzeugt keine Videoframes. Medien werden nicht gelesen oder hochgeladen. Vor dem Schließen herunterladen; es wird nichts dauerhaft gespeichert.
+
+### Drag & drop / Ordner ablegen
+
+The easiest import: drag the USB root folder into the workshop drop area. It recursively collects media filenames, retaining subfolders and omitting the outer folder name. If you drag a subfolder such as `videos` instead, uncheck **Dropped folder is the USB root** to retain `videos/` in the paths. Multiple dropped folders use the same setting. Individual files supply names only. Folder drops add entries and ignore existing playlists and helper frame images; drop an M3U separately to import its order and timing. Supported browsers use the File and Directory Entries API; the folder picker remains available as a fallback. Large/unreadable folders fail without a partial import (limit: 10,000 entries). No media contents are read or uploaded.
+
+Am einfachsten: USB-Hauptordner in die Werkstatt ziehen. Die Seite durchsucht Unterordner und entfernt den äußeren Ordnernamen. Beim Ablegen eines Unterordners wie `videos` das Häkchen **Abgelegter Ordner ist das USB-Hauptverzeichnis** entfernen, damit `videos/` erhalten bleibt. Die Einstellung gilt auch für mehrere abgelegte Ordner. Einzeldateien liefern nur Namen. Ordner ergänzen Medien, ignorieren vorhandene M3U und Hilfsbilder; für Reihenfolge und Zeiten eine M3U separat ablegen. Falls der Browser Ordner-Drop nicht unterstützt, Ordnerauswahl verwenden. Unlesbare/zu große Ordner werden ohne Teilimport abgebrochen (maximal 10.000 Einträge). Keine Medieninhalte werden gelesen oder hochgeladen.
+
+### Add entries manually / Einträge manuell ergänzen
+
+At the end of the visual playlist, **Add another entry** appends a USB-relative video or picture path. An optional title, duration and outgoing blend can be set. Empty duration means a full video or a ten-second picture. Positive seconds limit a video or set picture duration; −1 means a full video. The same file may appear more than once. New entries can be reordered or removed like imported ones. Adding an entry does not copy the media: the referenced file must already exist on the USB stick.
+
+Am Ende der visuellen Liste hängt **Weiteren Eintrag hinzufügen** ein Video oder Bild per USB-relativem Dateipfad an. Titel, Dauer und Blende sind einstellbar. Leere Dauer bedeutet ganzes Video oder zehn Sekunden Bild. Positive Sekunden setzen Videolimit/Bilddauer, −1 spielt das ganze Video. Dieselbe Datei darf mehrfach vorkommen. Neue Einträge lassen sich wie importierte sortieren und entfernen. Die Medien werden nicht mitkopiert; die Datei muss auf dem Stick vorhanden sein.
+
+### Automatic text import / Automatische Textübernahme
+
+Pasting or editing filenames/M3U updates the playlist immediately, without an Apply button. Clearing the text empties the playlist. Reordering or editing cards updates the text too. To extend an existing list, drop more media or use the manual entry form below; a pasted replacement list replaces the current order. Invalid text shows a message and retains the last usable list.
+
+Dateinamen oder M3U einfügen/bearbeiten aktualisiert die Playlist sofort, ohne Übernehmen-Knopf. Leerer Text leert die Playlist. Sortieren oder Bearbeiten der Einträge aktualisiert auch den Text. Zum Ergänzen weitere Medien ablegen oder unten manuell hinzufügen; eine neu eingefügte Textliste ersetzt die bisherige Reihenfolge. Ungültiger Text zeigt einen Hinweis und behält die letzte brauchbare Liste.

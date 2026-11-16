@@ -45,3 +45,15 @@ export function suggestedRoot(text) {
   const first = text.split(/\r?\n/).map(clean).find(x => x && !x.startsWith('#')) || '';
   return first.match(/^[A-Za-z]:/)?.[0] || first.match(/^\/Volumes\/[^/]+/)?.[0] || '';
 }
+
+export function manualEntry(path, duration = '', fade = '1.5', title = '') {
+  path = clean(path);
+  if (!path || /[\r\n:]/.test(path) || path.startsWith('/') || path.startsWith('#') || path.split('/').some(p => p === '..' || p.startsWith('.'))) throw new Error('path');
+  const kind = kindOf(path);
+  if (!kind) throw new Error('path');
+  const seconds = String(duration).trim() === '' ? (kind === 'image' ? 10 : -1) : Number(duration);
+  const blend = Number(fade);
+  if (!Number.isFinite(seconds) || seconds > 86400 || !(seconds > 0 || (kind === 'video' && seconds === -1))) throw new Error('duration');
+  if (String(fade).trim() === '' || !Number.isFinite(blend) || blend < 0 || blend > 10) throw new Error('fade');
+  return {path, kind, duration: seconds, fade: blend, title: title.replace(/[\r\n]/g, ' ')};
+}
