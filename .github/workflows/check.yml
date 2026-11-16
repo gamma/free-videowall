@@ -18,6 +18,8 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run test:website
+      - run: npm run test:tizen
+      - run: python3 scripts/test_verify_tizen_release.py
       - run: python3 scripts/build.py
       - run: python3 scripts/verify_website.py
       - uses: actions/upload-artifact@v4
