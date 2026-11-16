@@ -43,6 +43,23 @@ zurückkehren. Die App sucht dann die Playlist erneut und beginnt die Wiedergabe
 Beenden und Neustarten der App sind dafür nicht erforderlich.
 Zurück **innerhalb von Free Videowall** beendet hingegen die App.
 
+## GitHub-Release-Artefakt
+
+Der Tag-Workflow stellt `free-videowall-tizen-unsigned.wgt` und dessen
+SHA-256-Prüfsumme bereit, wenn der Tag diese Samsung-Version und den erweiterten
+Release-Workflow enthält. Das öffentliche WGT enthält keine gerätespezifischen
+Signaturen. Es muss vor Installation für den Ziel-TV signiert werden:
+
+```sh
+unzip free-videowall-tizen-unsigned.wgt -d samsung-preview
+# Im SDK, mit einem bereits eingerichteten eigenen Samsung-Zertifikatsprofil:
+tizen package -t wgt -s DEIN_PROFIL -- samsung-preview
+```
+
+Das ist ein Entwicklerartefakt, keine Store-Freigabe. Dein Profil muss für den
+Ziel-TV eingerichtet sein. Details zu Tag, Trockenlauf und Versionsschema:
+[Release-Automation](automation.md#samsung-artefakt).
+
 ## Im Docker-Container bauen
 
 Auf dem Host werden Docker und Python 3.9+ für den Aufruf benötigt; das SDK
