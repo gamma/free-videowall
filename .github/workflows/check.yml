@@ -18,9 +18,17 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run test:website
+      - run: npm run test:webos
+      - run: python3 -m unittest discover -s tests -p 'test_build_webos.py'
+      - run: npm run build:webos
       - run: python3 scripts/build.py
       - run: python3 scripts/verify_website.py
       - uses: actions/upload-artifact@v4
         with:
           name: free-videowall
           path: dist/free-videowall.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: free-videowall-lg-homebrew
+          path: dist/*.ipk
+          if-no-files-found: error

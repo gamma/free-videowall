@@ -2,6 +2,16 @@
 
 ## English
 
+### LG Homebrew tag build
+
+Tags containing the webOS player now also run its tests and build an LG IPK
+using the tag version. The same GitHub prerelease and `SHA256SUMS` include this
+artifact. A rooted LG TV, Homebrew Channel and service elevation are required;
+this is not an LG Content Store release or a Homebrew catalog submission.
+See [webOS build and installation](webos.md#tag-builds-and-github-releases).
+Branch CI uploads an IPK artifact too. No TV connection or signing secrets are
+needed for these builds.
+
 ### Available now: GitHub preview releases
 
 Push a version tag matching both `manifest` and `package.json`, for example `v1.0.7`. The **Release preview** workflow installs locked dependencies, checks BrightScript, tests the playlist parser, builds the public ZIP, verifies version/assets/license/private-frame exclusion and publishes a GitHub **prerelease** with SHA-256 checksum.
@@ -25,6 +35,14 @@ Public Store release still needs the Developer Dashboard, applicable tests and R
 Sources: [Roku packaging](https://developer.roku.com/dev/docs/packaging-channels), [app publishing](https://developer.roku.com/dev/docs/channel-publishing-guide), [early-adopter App Manager API](https://roku-sdk-docs.s3.amazonaws.com/early-adopter-docs/App%20Manager%20API/App%20Manager%20API.pdf).
 
 ## Deutsch
+
+### LG-Homebrew-Build bei Tags
+
+Tags mit dem webOS-Player bauen zusätzlich das LG-IPK mit der Tag-Version und
+führen die LG-Tests aus. IPK und SHA-256-Prüfsumme landen im selben GitHub-Release.
+Die Installation benötigt einen gerooteten LG, Homebrew Channel und die
+Diensterhöhung; eine Einreichung bei LG oder im Homebrew-Katalog erfolgt nicht.
+Auch Branch-CI liefert ein IPK-Artefakt. Details: [webOS](webos.md#tag-builds-and-github-releases).
 
 ### Bereits eingerichtet: GitHub-Vorschau
 

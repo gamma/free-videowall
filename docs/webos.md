@@ -8,6 +8,7 @@ ATLauncher, rooting or firmware.
 
 ```sh
 npm run test:webos
+python3 -m unittest discover -s tests -p 'test_build_webos.py'
 npm run build:webos
 python3 scripts/probe_webos_usb.py --host TV_IP
 ```
@@ -19,6 +20,35 @@ web app and a JS service. It needs no SDK or signing certificate. Output:
 The seven Node tests cover mounted-volume filtering, AppleDouble exclusion,
 path/symlink confinement, HTTP byte ranges, unplug/replug invalidation, decoder
 repeat, duplicate end events, and stale/background callbacks.
+Two Python integration tests build and inspect the real IPK, verify version
+consistency and reproducibility, reject invalid versions, and check that source
+metadata remains unchanged.
+
+## Tag builds and GitHub releases
+
+The `Release preview` workflow builds the LG Homebrew IPK alongside the Roku
+ZIP for a pushed `vMAJOR.MINOR.PATCH` tag containing the webOS source. The tag
+must still match the repository's Roku manifest and root `package.json`, as
+required by the existing release checks. The LG build takes its version from
+that tag; app metadata, service metadata, package control and runtime diagnostic
+version all agree without modifying the tagged source files.
+
+The prerelease includes `de.gammaproduction.freevideowall_<version>_all.ipk`
+and its SHA-256 entry in `SHA256SUMS`. Release notes identify the IPK as requiring
+a rooted LG TV, Homebrew Channel and service elevation. This does not submit
+the app to LG Content Store or the Homebrew Channel catalog.
+
+Branch checks also run the LG tests and upload a `free-videowall-lg-homebrew`
+Actions artifact. To rehearse a tagged release, dispatch `Release preview` for
+an existing tag containing this change and leave `publish` disabled. Old tags
+without webOS source continue to build only their existing Roku assets.
+Existing GitHub releases and their files are preserved.
+
+To build a particular package version locally:
+
+```sh
+python3 scripts/build_webos.py --version 1.0.16 --output-dir dist/lg-homebrew
+```
 
 ## Install on a rooted TV
 

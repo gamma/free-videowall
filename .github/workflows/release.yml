@@ -43,6 +43,17 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run test:website
+      # Older tags can still be checked with workflow_dispatch; they have no LG source.
+      - name: Test LG Homebrew player and packager
+        if: hashFiles('platforms/webos/app/appinfo.json') != ''
+        run: |
+          npm run test:webos
+          python3 -m unittest discover -s tests -p 'test_build_webos.py'
+      - name: Build LG Homebrew IPK with the tag version
+        if: hashFiles('platforms/webos/app/appinfo.json') != ''
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: python3 scripts/build_webos.py --version "${RELEASE_TAG#v}"
       - run: python3 scripts/build.py
       - run: python3 scripts/verify_website.py
       - name: Bundle Store listing assets
@@ -53,7 +64,9 @@ jobs:
         run: |
           python3 release-tools/scripts/verify_release.py --root . --tag "$RELEASE_TAG"
           cd dist
-          sha256sum free-videowall.zip store-assets.zip > SHA256SUMS
+          assets=(free-videowall.zip store-assets.zip)
+          if compgen -G '*.ipk' >/dev/null; then assets+=(*.ipk); fi
+          sha256sum "${assets[@]}" > SHA256SUMS
       - uses: actions/upload-artifact@v4
         with:
           name: release-${{ inputs.tag || github.ref_name }}
@@ -61,6 +74,7 @@ jobs:
             dist/free-videowall.zip
             dist/SHA256SUMS
             dist/store-assets.zip
+            dist/*.ipk
       - name: Publish GitHub preview
         if: github.event_name == 'push' || inputs.publish
         env:
@@ -72,9 +86,16 @@ jobs:
             echo 'Release already exists; preserving its files.'
             exit 0
           fi
-          gh release create "$RELEASE_TAG" dist/free-videowall.zip dist/store-assets.zip dist/SHA256SUMS \
+          assets=(dist/free-videowall.zip dist/store-assets.zip dist/SHA256SUMS)
+          notes='Development preview / Entwicklungsversion. Roku ZIP requires developer mode; not a Roku Store release.'
+          if compgen -G 'dist/*.ipk' >/dev/null; then
+            assets+=(dist/*.ipk)
+            notes+=' LG Homebrew IPK requires a rooted webOS TV, Homebrew Channel and USB service elevation; not an LG Content Store release. See docs/webos.md in the tagged source for installation.'
+          fi
+          notes+=' No user media included. Website: https://videowall.gh.gammaproduction.de/ . Store text and public artwork are in store-assets.zip.'
+          gh release create "$RELEASE_TAG" "${assets[@]}" \
             --verify-tag --prerelease --title "Free Videowall $RELEASE_TAG" \
-            --notes 'Development preview / Entwicklungsversion. Requires Roku developer mode; not a Roku Store release. EN/DE setup and playlist instructions are in the README. No user media included. Website: https://gamma.github.io/free-roku-videowall/ . Store text and public artwork are in store-assets.zip.'
+            --notes "$notes"
 
   website:
     needs: release

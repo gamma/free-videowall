@@ -76,7 +76,7 @@
         else scan();
     });
     document.addEventListener("keydown",function(event){if(event.keyCode===461)window.close();});
-    window.videowallState=function(){return {version:"0.1.0",active:active,index:index,count:items.length,
+    window.videowallState=function(){return {version:window.videowallVersion || "0.1.0",active:active,index:index,count:items.length,
         currentTime:video.currentTime,duration:video.duration,paused:video.paused,readyState:video.readyState,
         loop:video.loop,status:status.textContent,hidden:document.hidden};};
     setInterval(scan,5000); scan();
