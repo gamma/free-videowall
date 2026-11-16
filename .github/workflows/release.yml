@@ -45,6 +45,19 @@ jobs:
       - run: npm run test:website
       - run: python3 scripts/build.py
       - run: python3 scripts/verify_website.py
+      - name: Test and build Samsung preview
+        if: hashFiles('platforms/tizen/config.xml') != ''
+        run: |
+          npm run test:tizen
+          python3 release-tools/scripts/test_verify_tizen_release.py
+          npm run build:tizen-image
+          # Linux runners do not remap bind-mount ownership like Docker Desktop.
+          # Use root only in this disposable build container, with no signing volume.
+          docker run --rm --platform linux/amd64 --user root \
+            --mount "type=bind,source=$PWD,target=/workspace" \
+            free-videowall/tizen-sdk:10.0 bash -ec \
+            'python3 scripts/build_tizen.py; tizen build-web -- dist/tizen; python3 scripts/package_tizen_unsigned.py'
+          python3 release-tools/scripts/verify_tizen_release.py --root .
       - name: Bundle Store listing assets
         run: python3 -c "import shutil; shutil.make_archive('dist/store-assets', 'zip', 'docs/store-assets')"
       - name: Validate public release
@@ -53,7 +66,11 @@ jobs:
         run: |
           python3 release-tools/scripts/verify_release.py --root . --tag "$RELEASE_TAG"
           cd dist
-          sha256sum free-videowall.zip store-assets.zip > SHA256SUMS
+          packages=(free-videowall.zip store-assets.zip)
+          if [ -f free-videowall-tizen-unsigned.wgt ]; then
+            packages+=(free-videowall-tizen-unsigned.wgt)
+          fi
+          sha256sum "${packages[@]}" > SHA256SUMS
       - uses: actions/upload-artifact@v4
         with:
           name: release-${{ inputs.tag || github.ref_name }}
@@ -61,6 +78,7 @@ jobs:
             dist/free-videowall.zip
             dist/SHA256SUMS
             dist/store-assets.zip
+            dist/free-videowall-tizen-unsigned.wgt
       - name: Publish GitHub preview
         if: github.event_name == 'push' || inputs.publish
         env:
@@ -72,9 +90,16 @@ jobs:
             echo 'Release already exists; preserving its files.'
             exit 0
           fi
-          gh release create "$RELEASE_TAG" dist/free-videowall.zip dist/store-assets.zip dist/SHA256SUMS \
+          assets=(dist/free-videowall.zip dist/store-assets.zip dist/SHA256SUMS)
+          notes='Development preview / Entwicklungsversion. Roku ZIP requires developer mode; not a Store release. EN/DE setup and playlist instructions are in the README. No user media included. Website: https://videowall.gh.gammaproduction.de/ . Store text and public artwork are in store-assets.zip.'
+          if [ -f dist/free-videowall-tizen-unsigned.wgt ]; then
+            assets+=(dist/free-videowall-tizen-unsigned.wgt)
+            notes+=$'\n\nSamsung: free-videowall-tizen-unsigned.wgt is UNSIGNED and cannot be installed directly. Sign it with your own Samsung certificates for your target TV; see docs/tizen.md in this tag. Tizen uses its own version from config.xml. No Samsung Store approval is implied. / Samsung-WGT ist unsigniert und muss vor der Installation fuer den Ziel-TV signiert werden.'
+          fi
+          printf '%s\n' "$notes" > /tmp/free-videowall-release-notes.md
+          gh release create "$RELEASE_TAG" "${assets[@]}" \
             --verify-tag --prerelease --title "Free Videowall $RELEASE_TAG" \
-            --notes 'Development preview / Entwicklungsversion. Requires Roku developer mode; not a Roku Store release. EN/DE setup and playlist instructions are in the README. No user media included. Website: https://videowall.gh.gammaproduction.de/ . Store text and public artwork are in store-assets.zip.'
+            --notes-file /tmp/free-videowall-release-notes.md
 
   website:
     needs: release

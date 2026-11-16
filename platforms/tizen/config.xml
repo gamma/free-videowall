@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="https://gammaproduction.de/free-videowall/tizen" version="0.1.1" viewmodes="maximized">
+    <tizen:application id="FreeVidWal.Player" package="FreeVidWal" required_version="3.0"/>
+    <content src="index.html"/>
+    <icon src="icon.png"/>
+    <name>Free Videowall</name>
+    <tizen:profile name="tv-samsung"/>
+    <tizen:privilege name="http://tizen.org/privilege/filesystem.read"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/appcommon"/>
+    <tizen:setting screen-orientation="landscape" context-menu="disable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
+</widget>
