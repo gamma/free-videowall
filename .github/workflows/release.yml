@@ -43,6 +43,17 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run test:website
+      # Older tags can still be checked with workflow_dispatch; they have no LG source.
+      - name: Test LG Homebrew player and packager
+        if: hashFiles('platforms/webos/app/appinfo.json') != ''
+        run: |
+          npm run test:webos
+          python3 -m unittest discover -s tests -p 'test_build_webos.py'
+      - name: Build LG Homebrew IPK with the tag version
+        if: hashFiles('platforms/webos/app/appinfo.json') != ''
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: python3 scripts/build_webos.py --version "${RELEASE_TAG#v}"
       - run: python3 scripts/build.py
       - run: python3 scripts/verify_website.py
       - name: Test and build Samsung preview
@@ -70,6 +81,7 @@ jobs:
           if [ -f free-videowall-tizen-unsigned.wgt ]; then
             packages+=(free-videowall-tizen-unsigned.wgt)
           fi
+          if compgen -G '*.ipk' >/dev/null; then packages+=(*.ipk); fi
           sha256sum "${packages[@]}" > SHA256SUMS
       - uses: actions/upload-artifact@v4
         with:
@@ -79,6 +91,7 @@ jobs:
             dist/SHA256SUMS
             dist/store-assets.zip
             dist/free-videowall-tizen-unsigned.wgt
+            dist/*.ipk
       - name: Publish GitHub preview
         if: github.event_name == 'push' || inputs.publish
         env:
@@ -95,6 +108,10 @@ jobs:
           if [ -f dist/free-videowall-tizen-unsigned.wgt ]; then
             assets+=(dist/free-videowall-tizen-unsigned.wgt)
             notes+=$'\n\nSamsung: free-videowall-tizen-unsigned.wgt is UNSIGNED and cannot be installed directly. Sign it with your own Samsung certificates for your target TV; see docs/tizen.md in this tag. Tizen uses its own version from config.xml. No Samsung Store approval is implied. / Samsung-WGT ist unsigniert und muss vor der Installation fuer den Ziel-TV signiert werden.'
+          fi
+          if compgen -G 'dist/*.ipk' >/dev/null; then
+            assets+=(dist/*.ipk)
+            notes+=' LG Homebrew IPK requires a rooted webOS TV, Homebrew Channel and USB service elevation; not an LG Content Store release. See docs/webos.md in the tagged source for installation.'
           fi
           printf '%s\n' "$notes" > /tmp/free-videowall-release-notes.md
           gh release create "$RELEASE_TAG" "${assets[@]}" \
