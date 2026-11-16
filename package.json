@@ -11,7 +11,9 @@
     "build:tizen": "python3 scripts/tizen_docker.py build",
     "test:website": "node --test tests/website/*.test.mjs",
     "stage:tizen": "python3 scripts/build_tizen.py",
-    "build:tizen-image": "python3 scripts/tizen_docker.py image"
+    "build:tizen-image": "python3 scripts/tizen_docker.py image",
+    "test:webos": "node --test platforms/webos/tests/*.test.js",
+    "build:webos": "python3 scripts/build_webos.py"
   },
   "devDependencies": {
     "brighterscript": "0.73.8",

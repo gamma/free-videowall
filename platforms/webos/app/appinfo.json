@@ -1,0 +1,11 @@
+{
+  "id": "de.gammaproduction.freevideowall",
+  "version": "0.1.0",
+  "vendor": "Gamma Production",
+  "type": "web",
+  "main": "index.html",
+  "title": "Free Videowall",
+  "icon": "icon.png",
+  "resolution": "1920x1080",
+  "disableBackHistoryAPI": true
+}
