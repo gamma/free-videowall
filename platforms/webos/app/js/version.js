@@ -1,1 +1,1 @@
-window.videowallVersion = "0.1.0";
+window.videowallVersion = "0.1.7";
