@@ -1,9 +1,10 @@
-/* One video decoder: dissolve cached stills above AVPlay, never two videos. */
+/* webOS: fade an outgoing still directly onto the decoded HTML video. */
 (function (root) {
     "use strict";
     function Transitions(outgoing, incoming) {
         var current = null, held = false, duration = 0, timer, serial = 0;
         function hide(layer) {
+            layer.onload = layer.onerror = null;
             layer.style.transition = "none";
             layer.style.opacity = "0";
             layer.style.display = "none";
@@ -40,18 +41,35 @@
                 if (token === serial && current === entry) entry.image = image;
             });
         }
-        function hold() {
+        function hold(done) {
             serial++;
+            var token = serial, settled = false;
             clearTimeout(timer);
             hide(incoming);
+            hide(outgoing);
             held = !!(current && current.image && current.fade > 0);
-            if (held) {
-                duration = current.fade;
-                outgoing.src = current.image.src;
-                outgoing.style.transition = "none";
-                outgoing.style.display = "block";
-                outgoing.style.opacity = "1";
-            } else hide(outgoing);
+            if (!held) { if (done) done(); return; }
+            duration = current.fade;
+            function ready(loaded) {
+                if (settled || token !== serial) return;
+                settled = true;
+                clearTimeout(timer);
+                outgoing.onload = outgoing.onerror = null;
+                held = loaded;
+                if (loaded) {
+                    outgoing.style.display = "block";
+                    outgoing.style.opacity = "1";
+                } else hide(outgoing);
+                if (done) done();
+            }
+            // This DOM image can refetch even though the detached preload is
+            // ready (USB responses use no-store). Never expose its black
+            // background or reset the decoder until it has actually loaded.
+            outgoing.onload = function () { ready(true); };
+            outgoing.onerror = function () { ready(false); };
+            timer = setTimeout(function () { ready(false); }, 2000);
+            outgoing.src = current.image.src;
+            if (outgoing.complete && outgoing.naturalWidth > 0) ready(true);
         }
         function reveal(item, done) {
             var token = serial;
@@ -75,10 +93,10 @@
                     done();
                 }, duration * 1000);
             }
-            // Images already occupy the underlying slide. Videos use the same
-            // start-frame sidecars as Roku, falling back to the running video.
-            if (held && item.kind === "video") load(item.firstImage, start);
-            else start(null);
+            // app.js calls reveal only after a decoded frame is displayed.
+            // A start-frame overlay would freeze the opening of a moving video
+            // and jump forward when removed while playback runs underneath.
+            start(null);
         }
         return {prepare:prepare, hold:hold, reveal:reveal, clear:clear};
     }

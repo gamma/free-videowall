@@ -17,9 +17,10 @@ The build uses Python's standard library to create a standard webOS IPK with a
 web app and a JS service. It needs no SDK or signing certificate. Output:
 `dist/de.gammaproduction.freevideowall_0.1.0_all.ipk`.
 
-The seven Node tests cover mounted-volume filtering, AppleDouble exclusion,
+The seventeen Node tests cover mounted-volume filtering, AppleDouble exclusion,
 path/symlink confinement, HTTP byte ranges, unplug/replug invalidation, decoder
-repeat, duplicate end events, and stale/background callbacks.
+repeat, duplicate end events, stale/background callbacks, decoded-frame reveal,
+and direct fades to running video.
 Two Python integration tests build and inspect the real IPK, verify version
 consistency and reproducibility, reject invalid versions, and check that source
 metadata remains unchanged.
@@ -93,8 +94,8 @@ is not a playback server.
 
 The UI is a full-screen HTML5 video/image loop with no menu or controls. A
 single full-length video uses the decoder's native `loop` mode. Multiple items
-reuse the Samsung prototype's pure playlist parser and still-frame transition
-module (copies in this platform directory; no Samsung changes). Positive
+use a local copy of the Samsung prototype's pure playlist parser and an
+adapted LG still-frame transition module (no Samsung changes). Positive
 `EXTINF` durations can shorten videos. Images default to 10 seconds. Polling
 rescans the USB every five seconds; returning from background triggers a fresh
 scan. Back closes the app.
@@ -120,3 +121,114 @@ scan. Back closes the app.
   app was initially absent from its stale cache. Starting the helper refreshed
   the app list and copied the correct Free Videowall icon. The helper lifecycle
   correction belongs to the separate ATLauncher repository.
+
+## Mixed-video transition correction
+
+The LG player waits for `requestVideoFrameCallback` and a rendering opportunity
+before uncovering the next video. A parallel fallback checks positive playback time with decoded data, including
+engines which expose frame callbacks but never call them (observed on this LG). Incoming videos are revealed directly, without a frozen
+start-image layer while the video advances beneath it.
+
+An outgoing video still needs a matching `.end.jpg` to cover decoder reset.
+Run `python3 scripts/prepare_usb.py /path/to/USB/autostart.m3u` after adding or
+changing videos. The tested stick initially had an end frame for its static-logo
+clip only; the colour-rotation clip had none. A video-plane canvas probe on this
+LG returned black pixels, so automatic canvas capture is not used as a fallback.
+Prepared end frames reflect the file end; shortened `EXTINF` videos still need
+an end image matching the chosen cut point.
+
+Testbuild 0.1.1 was installed and its JS sources compared with the local build.
+Live event recording covered both directions of the two-video playlist: the
+outgoing 1280-wide end image remained visible during decoder reset; fading began
+only after positive playback progress and lasted 1.5 seconds. Playback continued
+without a status message or stuck cover. Visual confirmation of black-free
+transitions is still pending; event recording cannot prove the physical display.
+
+A subsequent owner report confirmed that 0.1.1 still flashed black. A 16 ms
+DOM/decoder trace then found a concrete gap: after decoder reset (`readyState:0`),
+the outgoing DOM image was still unloaded (`naturalWidth:0`) for about 57 ms.
+The detached image preload did not prevent a second request for the visible
+image. Testbuild 0.1.2 waits for the actual cover element's load event before
+showing it, gives it a paint opportunity, and only then resets the decoder.
+The original 0.1.1 event trace was insufficient evidence of a painted cover.
+
+The owner confirmed PNG-to-video working on 0.1.2, but video-to-PNG still
+flashed black. Testbuild 0.1.3 retains the paused video decoder/buffer when
+entering an image instead of clearing its source and calling `load()`. The PNG
+has an opaque black background and receives two animation frames after loading
+before the outgoing end image fades. A later video or backgrounding still
+releases/reopens the decoder. A regression test checks retained decoder state,
+image paint ordering and cleanup on backgrounding. Visible acceptance is pending.
+
+Live 0.1.3 recording observed the return fade with the PNG loaded at 1920 pixels,
+the video source retained at its 30-second end, and decoder readyState remaining
+4. The next PNG-to-video transition also completed with a loaded cover. Physical
+black-flash acceptance still requires the owner; this trace is not a screen capture.
+
+Testbuild 0.1.4 changes video-to-image transitions to a live overlap: the following
+PNG is preloaded invisibly in its actual slide element. During the outgoing
+video's final fade interval (28.5–30 seconds for a 30-second clip with 1.5-second
+fade), the PNG fades in over the still-running video. The effective end respects
+both the actual video duration and a shorter positive EXTINF limit. Only at that
+end is the video paused; the PNG then receives its full configured hold time.
+Hidden/stale callbacks cancel the overlap. A missing PNG preload falls back to
+the safe post-end transition. Video-to-video transitions retain the still-frame
+path. This implements the owner's requested visible overlap instead of fading
+between the nearly identical video end frame and the PNG after video end.
+
+The owner subsequently confirmed the 0.1.3 return no longer flashes black, but
+found the post-end fade invisible. A direct end-JPEG/PNG comparison found only
+0.29–0.44 mean channel levels of difference out of 255: the colour-rotation video
+returns to the original PNG's appearance at its end. The owner requested the
+0.1.4 live overlap during the final 1.5 seconds instead.
+
+The owner accepted the timing of the 0.1.4 live overlap, but reported a white
+brightness increase during the blend. Testbuild 0.1.5 adds a complementary
+video-opacity fade from one to zero while the PNG fades from zero to one,
+using the same remaining-video duration. This is a device compositing test;
+physical brightness acceptance is pending. The hardware plane's visual mixing
+cannot be established from DOM opacity alone.
+
+The owner reported dimming with 0.1.5 complementary opacities. Testbuild 0.1.6
+uses `mix-blend-mode: plus-lighter` on the PNG during the live overlap and an
+isolated body compositing group. Source-over with both layers fading attenuates
+the video twice; additive premultiplied contributions avoid that arithmetic dip.
+The LG Chrome 120 engine reports support for plus-lighter and isolation. The
+blend mode returns to normal at completion or stop. Hardware-plane brightness
+and playback acceptance remain pending on the physical TV.
+Reference: https://drafts.fxtf.org/compositing-2/#plus-lighter
+
+### Temporary overscan correction (rooted LG, 0.1.7)
+
+The tested LG's video scaler cropped 48 horizontal and 27 vertical pixels from
+1080p video (1824x1026 source window), enlarging the logo relative to the PNG.
+The actual PNG and all 900 video frames have matching logo bounds. With Just
+Scan enabled, the scaler uses the entire 1920x1080 source at x0/y0.
+
+The elevated USB service now temporarily enables Just Scan for the active DTV
+video context, journaling its previous value in
+`/var/lib/freevideowall/overscan.json`. It restores that value on app hide/exit.
+The app renews a 35-second lease through its existing five-second USB poll; a
+missing client expires the lease. Restore failures retain the journal and retry.
+Service restart also attempts journal recovery. An already enabled setting is
+left enabled, and a later independent change to off/auto is preserved. HDMI
+contexts are excluded. This uses private rooted-TV APIs, not a portable webOS
+app preference. A service crash/power loss may delay restoration until service
+restart. The one-off HDMI2/FHD adjustment made during diagnosis is separate.
+
+0.1.7 also replaces the additive two-layer fade experiment with ordinary
+source-over: the video stays opaque while the PNG fades in during its final
+1.5 seconds. This avoids multiplying the video contribution twice. The isolated
+blend group is removed. The hardware video buffer is still retained through
+image handoff. Physical brightness acceptance remains open.
+
+Validation: 25 webOS tests and two packaging tests pass. Installed 0.1.7
+reported active USB video playback. The service saved previous Just Scan=off;
+after closing the app, its journal was cleared and the TV setting read back off.
+
+Live follow-up on 0.1.7 identified Free Videowall as the active video client:
+full source 1920x1080 at x0/y0, overscan N, Just Scan on. Closing via
+`applicationManager/closeByAppId` restored off and removed the journal. A live
+computed-style trace recorded video opacity 1 throughout the outgoing overlap,
+PNG opacity rising from 0, and normal blend mode; the image then held with the
+decoder paused. These are runtime checks, not physical-screen brightness proof.
